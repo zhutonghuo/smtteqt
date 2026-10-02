@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EQuake 发报台</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" onerror="this.onerror=null;this.href='https://cdn.staticfile.org/leaflet/1.9.4/leaflet.css'">
+<style>
+:root{--bg:#f4f6f8;--card:#fff;--line:#dde3ea;--txt:#1c2733;--sub:#66788c;--acc:#1565c0;--ok:#2e7d32;--warn:#c62828;}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.5 "Segoe UI","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--txt)}
+header{background:var(--card);border-bottom:1px solid var(--line);padding:12px 18px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;position:sticky;top:0;z-index:900}
+header h1{font-size:17px;margin:0 14px 0 0}
+.sub{color:var(--sub);font-size:12px}
+#subUrl{font-family:Consolas,monospace;background:#eef3f8;padding:3px 8px;border-radius:4px;border:1px solid var(--line);user-select:all;cursor:pointer}
+button{cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--txt);border-radius:6px;padding:5px 12px;font-size:13px}
+button:hover{border-color:var(--acc);color:var(--acc)}
+button.primary{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:600}
+button.primary:hover{opacity:.9;color:#fff}
+button.danger{color:var(--warn)}
+button.mini{padding:2px 8px;font-size:12px;border-radius:4px}
+#dot{width:10px;height:10px;border-radius:50%;background:#bbb;display:inline-block;vertical-align:-1px}
+#dot.on{background:var(--ok)}
+main{padding:14px 18px;max-width:1100px;margin:0 auto}
+#map{height:360px;border-radius:8px;border:1px solid var(--line);z-index:1}
+#moreMap{height:300px;border-radius:8px;border:1px solid var(--line);z-index:1;margin:0 0 10px;background:#eaf0f6}
+.maphead{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 6px;font-size:13px}
+.maphead select{font-size:12px;padding:3px 6px;border-radius:5px;border:1px solid var(--line);background:var(--card);color:var(--txt)}
+#mapFallback{display:none;height:360px;border-radius:8px;border:1px dashed var(--warn);color:var(--warn);align-items:center;justify-content:center;text-align:center;padding:20px}
+.mapWrap{position:relative}
+#baseSel{position:absolute;top:10px;right:10px;z-index:1100;width:auto;background:#fff;border:1px solid var(--line);border-radius:6px;padding:4px 8px;font-size:13px;box-shadow:0 1px 6px rgba(0,0,0,.15)}
+.legend{position:absolute;left:10px;bottom:10px;z-index:1100;background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:6px;padding:4px 8px;font-size:12px;color:var(--sub)}
+.cities{margin:8px 0 4px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.hint{color:var(--sub);font-size:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin:12px 0}
+.card .head{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
+.card .head b{font-size:15px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px 12px}
+label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--sub)}
+input[type=text],input[type=number],select{border:1px solid var(--line);border-radius:5px;padding:5px 7px;font-size:13px;color:var(--txt);background:#fff;width:100%}
+input:focus,select:focus{outline:none;border-color:var(--acc)}
+.rowflex{display:flex;gap:6px;align-items:center}
+.chkline{display:flex;flex-wrap:wrap;gap:14px;margin-top:8px;font-size:13px}
+.chkline label{flex-direction:row;align-items:center;color:var(--txt)}
+.cardHint{font-size:12px;color:var(--sub);margin-top:6px;border-top:1px dashed var(--line);padding-top:6px}
+.restamp{font-size:12px;color:var(--sub)}
+.wavekm{display:block;font-size:11px;color:var(--sub);margin-top:2px}
+.delayline{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:13px;color:var(--txt)}
+.delayline input{width:96px}
+#planInfo{margin:4px 0 10px}
+#preview{background:#0d1520;color:#cde3ff;border-radius:8px;padding:12px;font:12px/1.5 Consolas,monospace;overflow:auto;max-height:320px;white-space:pre;margin:14px 0}
+#logPanel{display:none;background:#0d1520;color:#cde3ff;border-radius:8px;padding:12px;font:12px/1.5 Consolas,monospace;overflow:auto;max-height:260px;white-space:pre;margin:10px 0}
+.sentbox{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 14px;margin:10px 0}
+.sentbox .sh{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
+.sentbox .sh b{font-size:14px}
+.sentrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:7px 0;border-top:1px dashed var(--line)}
+.sentrow:first-of-type{border-top:none}
+.sentrow .id{font-family:Consolas,monospace;font-size:12px;background:#eef3f8;border:1px solid var(--line);border-radius:4px;padding:2px 7px;user-select:all}
+.sentrow .seq{display:inline-block;min-width:20px;text-align:center;font-family:Consolas,monospace;font-size:12px;font-weight:700;background:#1565c0;color:#fff;border-radius:4px;padding:2px 6px}
+.sentrow .seq-lbl{font-size:11px;padding:1px 6px;border-radius:4px}
+.sentrow .seq-lbl.new{color:#1565c0;border:1px solid #c3d9f2;background:#eef4ff}
+.sentrow .seq-lbl.old{color:#8a5a00;border:1px solid #f0d9b5;background:#fff8ec}
+.sentrow .meta{font-size:12px;color:var(--sub)}
+.sentsub{width:100%;font-size:11px;color:var(--sub);padding:2px 0 1px 2px;line-height:1.5;word-break:break-all}
+.tag{display:inline-block;font-size:11px;border-radius:4px;padding:1px 6px;border:1px solid var(--line);color:var(--sub)}
+.tag.eew{color:#1565c0;border-color:#c3d9f2;background:#eef4ff}
+.tag.final{color:#00695c;border-color:#bfe3da;background:#eafaf6}
+.tag.plum{color:#6a1b9a;border-color:#e0ccf0;background:#f7f0ff}
+.tag.cancel{color:var(--warn);border-color:#f3c2bd;background:#fdecea}
+.tag.pending{color:#8a5a00;border-color:#f0d9b5;background:#fff8ec}
+.sentempty{font-size:12px;color:var(--sub)}
+.senterr{font-size:12px;color:var(--warn);background:#fdecea;border:1px solid #f3c2bd;border-radius:5px;padding:7px 10px;line-height:1.6}
+.sentbox.hot{border-color:#c9d8ea;box-shadow:0 1px 3px rgba(20,60,110,.06)}
+.modal-wrap{position:fixed;inset:0;background:rgba(15,25,40,.42);display:none;z-index:9999;overflow:auto;padding:24px 12px}
+.modal-wrap.on{display:block}
+.modal-box{max-width:780px;margin:0 auto;background:var(--card);border:1px solid var(--line);border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,.25)}
+.modal-hd{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--card);z-index:2}
+.modal-hd b{font-size:15px}
+.modal-bd{padding:12px 16px}
+.modal-ft{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px 16px;border-top:1px solid var(--line)}
+.card .f-id[readonly],.card .f-id.locked{background:#f1f4f8;color:#77869b;cursor:not-allowed}
+.modal-note{font-size:12px;color:var(--sub);margin:0 0 8px}
+.disc-main{font-size:15px;line-height:1.9;color:var(--warn);font-weight:600}
+.disc-sub{font-size:12px;line-height:1.8;color:var(--sub);margin-top:10px}
+.seriesline{flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;color:var(--txt);background:#f7f9fc;border:1px dashed var(--line);border-radius:6px;padding:8px 10px;margin-bottom:4px}
+.seriesline input{width:62px;padding:3px 6px;border:1px solid var(--line);border-radius:4px}
+.seriesline .hint{flex-basis:100%}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:6px 0 2px}
+#msg{font-size:13px}
+#msg.ok{color:var(--ok)} #msg.err{color:var(--warn)}
+#banner{display:none;padding:8px 18px;font-size:13px;background:#fff4e5;color:#8a5a00;border-bottom:1px solid #f0d9b5}
+#banner.err{background:#fdecea;color:#8a1c14;border-color:#f3c2bd}
+#banner code{background:#fff;padding:1px 6px;border-radius:4px;border:1px solid #e6d3ad;user-select:all}
+</style>
+</head>
+<body>
+<header>
+  <h1>📡 EQuake 发报台</h1>
+  <span class="sub">EQuake 订阅地址（每秒轮询）：</span>
+  <span id="subUrl" title="点击复制">检测中…</span>
+  <button class="mini" onclick="copySub()">复制</button>
+  <button class="mini" onclick="setServer()">设置服务器</button>
+  <span style="flex:1"></span>
+  <span class="sub">服务器</span><span id="dot"></span><span id="dotTxt" class="sub">检测中…</span>
+  <span id="cli" class="sub"></span>
+  <button class="mini" onclick="reconnect()">重新连接</button>
+</header>
+<div id="banner"></div>
+<main>
+  <div class="mapWrap">
+    <div id="map"></div>
+    <select id="baseSel" title="底图切换">
+      <option value="amap">高德 · 矢量</option>
+      <option value="amapsat">高德 · 卫星</option>
+      <option value="osm">OpenStreetMap（境外备用）</option>
+    </select>
+    <div class="legend">地图经纬度（GCJ-02）↔ 报文字段（WGS-84）已自动互转</div>
+  </div>
+  <div id="mapFallback">地图组件加载失败（可能离线）。<br>仍可直接在下方报文卡里手动输入经纬度，或用城市快捷按钮。</div>
+  <div class="cities">
+    <span class="hint">地图点击/拖标记选点（自动换算为 WGS-84 写入报文）/ 快捷城市：</span>
+    <button class="mini" onclick="goCity(35.68,139.76)">东京</button>
+    <button class="mini" onclick="goCity(24.45,122.9)">台湾以东海域</button>
+    <button class="mini" onclick="goCity(39.90,116.40)">北京</button>
+    <button class="mini" onclick="goCity(31.23,121.47)">上海</button>
+    <button class="mini" onclick="goCity(30.57,104.07)">成都</button>
+    <button class="mini" onclick="goCity(38.30,142.40)">三陆冲</button>
+    <button class="mini" onclick="goCity(31.00,142.20)">日本以南海域</button>
+  </div>
+  <div class="hint" style="margin-bottom:4px">提示：把 <b id="subUrl2">…</b> 填进 EQuake 的数据源地址即可；点「发布到服务器」后 EQuake 下一秒就会收到。</div>
+
+  <div class="sentbox">
+    <div class="sh">
+      <b>本次服务器已发出的地震</b>
+      <span id="sentCount" class="hint"></span>
+      <span class="hint">（服务器重启/页面刷新后这里会清空）— 可继续给同一事件<b>加报下一报</b>，或<b>直接取消本次地震</b></span>
+      <span style="flex:1"></span>
+      <button class="mini" onclick="refreshSent()">↻ 刷新</button>
+    </div>
+    <div id="sentList"></div>
+  </div>
+
+  <div class="toolbar">
+    <button class="primary" onclick="publish()">📤 发布到服务器</button>
+    <label class="chk" style="color:var(--txt)"><input type="checkbox" id="useDelay" checked> ⏱ 按延迟逐条投递</label>
+    <button onclick="addCard()">＋ 添加一报</button>
+    <button onclick="loadSample()">载入示例报文</button>
+    <button onclick="copyJson()">复制 JSON</button>
+    <button onclick="toggleLog()">服务器日志</button>
+    <button class="danger" onclick="clearSrv()">清空当前发布</button>
+    <span id="msg"></span>
+  </div>
+  <div id="planInfo" class="hint"></div>
+
+  <div class="seriesline" id="mainSeries">
+    <b>🎲 生成多报序列</b>
+    共 <input type="number" id="msN" value="6" min="2" max="99"> 报
+    <select id="msNMode"><option value="exact">精确</option><option value="approx" selected>大约</option></select>
+    每报间隔 <input type="number" id="msG" value="4" min="0" max="600"> 秒
+    <select id="msGMode"><option value="exact">精确</option><option value="approx" selected>大约</option></select>
+    <button class="mini" onclick="genSeriesMain()">生成到卡片区</button>
+    <span class="hint">先在<b>上方卡片区填好最终报</b>（震级/震中/深度/震度/类型设成最终想要的，并勾好「波从震中重新发出」），点这里自动生成一串<b>由弱到强、数值来回飘</b>的报，<b>末报=你填的最终报</b>；
+    「大约」会在你填的数附近随机浮动（报数、间隔都飘忽），「精确」则严格按你填的执行；生成后可逐张微调再发布。</span>
+  </div>
+
+  <div id="logPanel"></div>
+
+  <div id="cards"></div>
+  <div id="preview"></div>
+  <div class="hint">
+    规则说明（来自 EQuake）：
+    ① maxIntensity / maxLgInt 三个档位：「具体值」（直接告诉 EQuake）、「不明」（EQuake 显示「不明」）、「EQuake 计算」（字段留空，由 EQuake 根据震级与震中距自行推算震度，不依赖 isCSIS，**默认就是这一档**）；勾选 isCSIS 也会把两字段输出为空；
+    ② isCSIS 不勾、震度为「不明」且震级 ≤ 1.0 时，EQuake 自动判为 IPF 单点；
+    ③ 时间按 UTC+9 填写；若需 JMA 24+ 时制（如凌晨 0 点写成 24/25 时），请手动修改时间文本；地震波控制（同一 eventID 的续报/加报默认「继着上一次波」、不重置）：勾「波从震中重新发出」= 送达时把发震时刻改写成送达时刻，波从震中刚出发；或填「震波已发出(秒)」= 送达时按此头程重发（波已向外扩约 秒×7km，不继着上一次）；两者都留空 = 沿用该事件已建立的震源时刻，波接着上一报继续向外扩（速报/PLUM 默认勾选重新发出；最终报告/取消报默认不勾，继着上波）；
+    ④ 底图为高德瓦片（GCJ-02 加密坐标），页面已自动与报文使用的 WGS-84 互转；高德对日本等境外海域无覆盖，可在地图右上角切到「OpenStreetMap 备用」；
+    ⑤ 「距上一报延迟」= 该报相对前一报晚多少秒送到 EQuake（EQuake 每秒轮询一次，实际精度约 1 秒）；第 1 报延迟填 0 即立即发出；典型用法：速报 → N 秒后最终报告 → 再 N 秒后取消报，共用一个 eventID；
+    ⑥ EQuake 的「P 波 / S 波」是**推算震源**的波前，与报文类型无关，受软件设置「隐藏推算震源P/S波」（配置键 IsHidePSWaveOfEstimatedEpicenter）控制，默认会显示。
+  </div>
+  <div class="hint" style="margin-top:6px">
+    🔍 排查「EQuake 一直显示罗蒙诺索夫海岭 / 不画震中X」：这通常是 EQuake 没有拿到有效数据（它显示了内置演示位置）。步骤：
+    ① 确认 EQuake 数据源地址与页顶订阅地址完全一致（http 开头、不要空格、不要 https）；
+    ② 先点「发布到服务器」，等 1~2 秒再看 EQuake；
+    ③ 点「服务器日志」：没有任何 EQuake 请求记录 = 地址/端口不通；有记录但仍不显示 = 点「载入示例报文」发布一条与官方示例完全一致的报文做对照，再不行把日志内容发我。
+  </div>
+</main>
+
+<div class="modal-wrap" id="moreModal">
+  <div class="modal-box">
+    <div class="modal-hd">
+      <b>继续加报</b>
+      <span class="hint" id="moreEv"></span>
+      <span style="flex:1"></span>
+      <button class="mini" onclick="closeMore()">✕ 关闭</button>
+    </div>
+    <div class="modal-bd" id="moreBody"></div>
+    <div class="modal-ft" id="moreFoot"></div>
+  </div>
+</div>
+
+<div class="modal-wrap on" id="discModal">
+  <div class="modal-box" style="max-width:560px;margin-top:8vh">
+    <div class="modal-hd"><b>⚠️ 免责声明</b></div>
+    <div class="modal-bd">
+      <div class="disc-main">本程序仅供测试模拟，如你使用本程序造成了社会恐慌等后果，本程序作者不承担任何责任。</div>
+      <div class="disc-sub">本工具只向你本机运行的 EQuake 发送<b>虚构</b>的地震报文，用于功能调试与演示。请勿把生成的内容当作真实预警对外发布、转发或用于任何可能误导他人的场合；由此产生的一切后果由使用者自行承担。</div>
+      <div class="disc-sub" style="color:var(--warn)">如您需要发布为任何对外公开的内容，请务必标注醒目的虚构提示。</div>
+    </div>
+    <div class="modal-ft">
+      <span style="flex:1"></span>
+      <button class="primary" onclick="closeDisc()">我已了解并同意，继续使用</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+'use strict';
+// ---------- 发报服务器连接：自动探测端口，支持页面不在服务器同源下打开 ----------
+let API = '';
+let apiReady = false;
+const DEFAULT_PORT = 8790;
+const PORT_MAX = 8810;
+
+function savedHost(){
+  try{ return localStorage.getItem('eq_srv') || ''; }catch(e){ return ''; }
+}
+function normBase(s){
+  s = (s || '').trim().replace(/\/+$/, '');
+  if(!s) return '';
+  return s.indexOf('http') === 0 ? s : 'http://' + s;
+}
+async function probeBase(base){
+  const ac = new AbortController();
+  const tm = setTimeout(()=>ac.abort(), 800);
+  try{
+    const r = await fetch(base + '/health', { cache: 'no-store', signal: ac.signal });
+    clearTimeout(tm);
+    if(!r.ok) return false;
+    const t = await r.text();
+    const j = JSON.parse(t);
+    return !!(j && j.ok);
+  }catch(e){ clearTimeout(tm); return false; }
+}
+async function findServer(){
+  const list = [];
+  const sv = normBase(savedHost());
+  if(sv) list.push(sv);
+  if((location.protocol === 'http:' || location.protocol === 'https:') && list.indexOf(location.origin) < 0){
+    list.push(location.origin);
+  }
+  for(let p = DEFAULT_PORT; p <= PORT_MAX; p++){
+    const u = 'http://127.0.0.1:' + p;
+    if(list.indexOf(u) < 0) list.push(u);
+  }
+  const res = await Promise.all(list.map(b => probeBase(b).then(ok => ({ b: b, ok: ok }))));
+  const hit = res.find(r => r.ok);
+  if(hit){ API = hit.b; apiReady = true; applyApi(); return API; }
+  API = '';
+  apiReady = false;
+  applyApi();
+  return null;
+}
+function applyApi(){
+  const dot = document.getElementById('dot');
+  const dt = document.getElementById('dotTxt');
+  const bn = document.getElementById('banner');
+  const s1 = document.getElementById('subUrl');
+  const s2 = document.getElementById('subUrl2');
+  if(apiReady){
+    dot.className = 'on';
+    dt.textContent = API.replace('http://', '');
+    s1.textContent = API + '/json';
+    s2.textContent = API + '/json';
+    if(location.origin !== API){
+      bn.className = '';
+      bn.style.display = 'block';
+      bn.innerHTML = '当前页面不是从发报服务器打开的，已自动连到 <code>' + API + '</code>。若浏览器安全策略拦截跨端口请求导致发不出去，请直接用浏览器打开 <code>' + API + '/</code> 操作。';
+    }else{
+      bn.style.display = 'none';
+    }
+  }else{
+    dot.className = '';
+    dt.textContent = '未连接';
+    s1.textContent = '服务器未启动';
+    s2.textContent = 'http://127.0.0.1:' + DEFAULT_PORT + '/json';
+    bn.className = 'err';
+    bn.style.display = 'block';
+    bn.innerHTML = '未检测到发报服务器：请双击 <code>启动服务器.bat</code>，再用浏览器打开 <code>http://127.0.0.1:' + DEFAULT_PORT + '/</code>。若端口被占用会自动顺延，点右上「设置服务器」也可手动指定。';
+  }
+}
+function reconnect(){ apiReady = false; applyApi(); findServer(); }
+function setServer(){
+  const cur = savedHost() || API || ('http://127.0.0.1:' + DEFAULT_PORT);
+  const v = prompt('填写发报服务器地址（含 http:// 与端口，留空=自动探测）', cur);
+  if(v === null) return;
+  try{ localStorage.setItem('eq_srv', v.trim()); }catch(e){}
+  reconnect();
+}
+async function postJson(path, body, qs){
+  if(!apiReady){
+    const s = await findServer();
+    if(!s) throw new Error('未检测到发报服务器，请先双击 启动服务器.bat');
+  }
+  let r;
+  try{
+    r = await fetch(API + path + (qs || ''), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: body
+    });
+  }catch(e){
+    apiReady = false; applyApi();
+    throw new Error('请求被拒绝：浏览器安全策略拦截了跨端口请求，或服务器已退出。请在浏览器直接打开 ' + (API || ('http://127.0.0.1:' + DEFAULT_PORT)) + '/ 使用');
+  }
+  const t = await r.text();
+  let j = null;
+  try{ j = JSON.parse(t); }catch(e){}
+  if(!j) throw new Error('服务器返回的不是 JSON（HTTP ' + r.status + '）：' + (t ? t.slice(0, 120) : '空响应'));
+  return j;
+}
+
+let map = null, marker = null, baseLayer = null, baseMode = 'amap';
+// 弹窗内独立地图实例（不污染主地图，可独立切底图）
+let moreMap = null, moreMarker = null, moreBaseLayer = null, moreBaseMode = 'amap';
+
+// ---------- 坐标系互转：高德底图 GCJ-02 <-> EQuake 报文 WGS-84 ----------
+const PI = Math.PI, GCJ_A = 6378245.0, GCJ_EE = 0.00669342162296594323;
+function transLat(x, y){
+  let ret = -100 + 2*x + 3*y + 0.2*y*y + 0.1*x*y + 0.2*Math.sqrt(Math.abs(x));
+  ret += (20*Math.sin(6*x*PI) + 20*Math.sin(2*x*PI)) * 2/3;
+  ret += (20*Math.sin(y*PI) + 40*Math.sin(y/3*PI)) * 2/3;
+  ret += (160*Math.sin(y/12*PI) + 320*Math.sin(y*PI/30)) * 2/3;
+  return ret;
+}
+function transLng(x, y){
+  let ret = 300 + x + 2*y + 0.1*x*x + 0.1*x*y + 0.1*Math.sqrt(Math.abs(x));
+  ret += (20*Math.sin(6*x*PI) + 20*Math.sin(2*x*PI)) * 2/3;
+  ret += (20*Math.sin(x*PI) + 40*Math.sin(x/3*PI)) * 2/3;
+  ret += (150*Math.sin(x/12*PI) + 300*Math.sin(x/30*PI)) * 2/3;
+  return ret;
+}
+function wgs2gcj(lng, lat){
+  let dLat = transLat(lng - 105, lat - 35);
+  let dLng = transLng(lng - 105, lat - 35);
+  const radLat = lat/180*PI;
+  let magic = Math.sin(radLat);
+  magic = 1 - GCJ_EE*magic*magic;
+  const sq = Math.sqrt(magic);
+  dLat = (dLat*180) / ((GCJ_A*(1-GCJ_EE)) / (magic*sq) * PI);
+  dLng = (dLng*180) / (GCJ_A/sq*Math.cos(radLat)*PI);
+  return [lng + dLng, lat + dLat];
+}
+function gcj2wgs(lng, lat){
+  let wlng = lng, wlat = lat;
+  for(let i = 0; i < 6; i++){
+    const g = wgs2gcj(wlng, wlat);
+    wlng += lng - g[0];
+    wlat += lat - g[1];
+  }
+  return [wlng, wlat];
+}
+// WGS-84 -> 当前底图坐标（mode 缺省走主地图 baseMode，弹窗传入 moreBaseMode 以隔离）
+function toDisplay(lat, lng, mode){
+  mode = mode || baseMode;
+  if(mode === 'osm') return [lat, lng];
+  const g = wgs2gcj(lng, lat);
+  return [g[1], g[0]];
+}
+// 当前底图坐标 -> WGS-84
+function fromDisplay(lat, lng, mode){
+  mode = mode || baseMode;
+  if(mode === 'osm') return [lat, lng];
+  const w = gcj2wgs(lng, lat);
+  return [w[1], w[0]];
+}
+
+// ---------- 底图瓦片 ----------
+const TILES = {
+  amap: {
+    url: 'https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}',
+    sub: '1234', max: 18, attr: '© 高德地图'
+  },
+  amapsat: {
+    url: 'https://webst0{s}.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}',
+    sub: '1234', max: 18, attr: '© 高德地图 卫星影像'
+  },
+  osm: {
+    url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    sub: '', max: 19, attr: '© OpenStreetMap'
+  }
+};
+function applyBase(mode){
+  if(!map) return;
+  const t = TILES[mode];
+  if(!t) return;
+  baseMode = mode;
+  if(baseLayer) map.removeLayer(baseLayer);
+  const opt = { maxZoom: t.max, minZoom: 3, attribution: t.attr };
+  if(t.sub) opt.subdomains = t.sub;
+  baseLayer = L.tileLayer(t.url, opt).addTo(map);
+  map.setMaxZoom(t.max);
+}
+function switchBase(mode){
+  if(!map || mode === baseMode) return;
+  const c = map.getCenter();
+  const w = fromDisplay(c.lat, c.lng); // 旧底图坐标 -> WGS
+  applyBase(mode);
+  map.setView(toDisplay(w[0], w[1]), map.getZoom());
+  redrawMarkerFromInput();
+}
+function setMarker(dlat, dlng){
+  if(!map) return;
+  if(!marker){
+    // interactive:false —— 标记不拦截鼠标事件，点击地图任何位置（含标记所在处）都能稳定重新选点。
+    // 之前用 draggable:true，标记落在光标下会吞掉后续点击，导致“第一次能选、后面点不动”。
+    marker = L.marker([dlat, dlng], { interactive: false }).addTo(map);
+  } else {
+    marker.setLatLng([dlat, dlng]);
+  }
+}
+function writeLatLng(lat, lng){
+  const c = document.querySelector('#cards .card:last-child');
+  if(!c) return;
+  c.querySelector('.f-lat').value = lat.toFixed(2);
+  c.querySelector('.f-lng').value = lng.toFixed(2);
+  render();
+}
+function redrawMarkerFromInput(){
+  if(!map) return;
+  const c = document.querySelector('#cards .card:last-child');
+  if(!c) return;
+  const lat = parseFloat(c.querySelector('.f-lat').value);
+  const lng = parseFloat(c.querySelector('.f-lng').value);
+  if(isFinite(lat) && isFinite(lng)) setMarker.apply(null, toDisplay(lat, lng));
+}
+
+const selI = ['不明','1','2','3','4','5-','5+','6-','6+','7'];
+const selL = ['不明','0','1','2','3','4'];
+// 下拉框选项：最前是 value="" 的「EQuake 计算」——选中后该字段输出空串，
+// 由 EQuake 根据震级与震中距自行推算震度（独立于 isCSIS）；默认就选中它
+function intOpts(arr){
+  return '<option value="" selected>EQuake 计算</option>' + arr.map(x=>'<option>'+x+'</option>').join('');
+}
+
+function nowJST(){
+  const t = new Date(Date.now() + (9*60 + new Date().getTimezoneOffset())*60000);
+  const p = n => String(n).padStart(2,'0');
+  return t.getFullYear()+'/'+p(t.getMonth()+1)+'/'+p(t.getDate())+' '+p(t.getHours())+':'+p(t.getMinutes())+':'+p(t.getSeconds());
+}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+// 发震时刻字符串 -> 时间戳（字符串按 UTC+9 解读）
+function tsToMs(s){
+  if(typeof s !== 'string') return null;
+  const m = s.match(/(\d{4})\/(\d{1,2})\/(\d{1,2})\s+(\d{1,3}):(\d{2}):(\d{2})/);
+  if(!m) return null;
+  let h = parseInt(m[4],10); const day = Math.floor(h/24); h = h%24; // 支持 JMA 24+ 时制
+  return Date.UTC(+m[1], +m[2]-1, +m[3], h, +m[5], +m[6]) + day*86400000;
+}
+// 未勾选「波从震中重新发出」却填了很早的发震时刻 -> EQuake 里波已经跑了一大段
+function staleWarn(arr){
+  const out = [];
+  arr.forEach((d,i)=>{
+    const la = parseFloat(d.latitude), lo = parseFloat(d.longitude);
+    if(!isFinite(la) || !isFinite(lo)) out.push('第'+(i+1)+'报 经纬度不是数字，EQuake 可能定位失败');
+    else if(la < -90 || la > 90 || lo < -180 || lo > 180) out.push('第'+(i+1)+'报 经纬度超出常规范围（lat='+la+' lon='+lo+'），EQuake 可能把震中画到极区');
+    // 续报/加报：沿用该事件上一次已建立的震源时刻，发震时刻本就是旧的（波接着跑），属正常，不再提示
+    if(SENT_ITEMS.some(x => x.eventID === d.eventID)) return;
+    const t = tsToMs(d.shockTime);
+    if(t === null || d.reStamp || (d.waveElapsed !== null && d.waveElapsed !== undefined)) return;
+    const lag = Math.round(Math.abs(Date.now() - (t - 9*3600000)) / 1000); // 时间串按 UTC+9 解读, 真实时间 = t - 9h
+    if(lag > 60){
+      const mm = Math.floor(lag/60), ss = lag%60;
+      out.push('第'+(i+1)+'报 发震时刻比现在早 '+mm+' 分 '+ss+' 秒，EQuake 里地震波会已经跑了一大段（要控制波的起点：勾「波从震中重新发出」= 送达时从震中出发，或填「震波已发出(秒)」指定已扩出的距离）');
+    }
+  });
+  return out;
+}
+
+function addCard(host){
+  const box = host || document.getElementById('cards');
+  const n = box.children.length + 1;
+  const div = document.createElement('div');
+  div.className = 'card';
+  div.innerHTML =
+  '<div class="head"><b>第 '+n+' 报</b>' +
+    '<label class="chk" style="color:var(--txt)"><input type="checkbox" class="f-en" checked> 启用</label>' +
+    '<span style="flex:1"></span>' +
+    '<button class="mini" onclick="preset(this,\'eew\')">EEW 速报</button>' +
+    '<button class="mini" onclick="preset(this,\'plum\')">PLUM</button>' +
+    '<button class="mini" onclick="preset(this,\'final\')">最终报告</button>' +
+    '<button class="mini" onclick="preset(this,\'cancel\')">取消报</button>' +
+    '<button class="mini danger" onclick="this.closest(\'.card\').remove();renum()">删除</button>' +
+  '</div>' +
+  '<div class="grid">' +
+    '<label>eventID 事件ID<input type="text" class="f-id" value="EQ_'+Date.now()+'"><span><button class="mini" onclick="reid(this)">换一个</button></span></label>' +
+    '<label>sourceName 信息源<input type="text" class="f-src" list="srcList" value="JMA"></label>' +
+    '<label>placeName 位置名（留空=软件内部地名库）<input type="text" class="f-place" placeholder="如：青森県東方沖"></label>' +
+    '<label>latitude 纬度<input type="number" step="0.1" class="f-lat" value="35.68"></label>' +
+    '<label>longitude 经度<input type="number" step="0.1" class="f-lng" value="139.76"></label>' +
+    '<label>depth 深度(km)<input type="number" step="1" class="f-dep" value="10"></label>' +
+    '<label>magnitude 震级<input type="number" step="0.1" class="f-mag" value="5.0"></label>' +
+    '<label>reportNum 第几报<input type="number" step="1" class="f-num" value="1" min="1"></label>' +
+    '<label>reportTime 发布时刻(UTC+9)<span class="rowflex"><input type="text" class="f-rt"><button class="mini" onclick="setNow(this,\'rt\')">现在</button></span></label>' +
+    '<label>shockTime 发震时刻(UTC+9)<span class="rowflex"><input type="text" class="f-st"><button class="mini" onclick="setNow(this,\'st\')">现在</button></span></label>' +
+    '<label>waveStart 震波已发出(秒)<input type="number" step="1" min="0" class="f-wave" placeholder="留空=继着上波"><span class="wavekm"></span></label>' +
+    '<label>maxIntensity 最大震度<select class="f-imi">'+intOpts(selI)+'</select></label>' +
+    '<label>maxLgInt 长周期地震动等级<select class="f-lgi">'+intOpts(selL)+'</select></label>' +
+  '</div>' +
+  '<div class="chkline">' +
+    '<label><input type="checkbox" class="f-csis"> isCSIS（速报，震度输出为空）</label>' +
+    '<label><input type="checkbox" class="f-plum"> isPLUM</label>' +
+    '<label><input type="checkbox" class="f-cancel"> isCancel</label>' +
+    '<label><input type="checkbox" class="f-final"> isFinal</label>' +
+  '</div>' +
+  '<div class="delayline">⏱ 距上一报延迟：<input type="number" step="1" min="0" class="f-delay" value="0"> 秒（0 = 与上一报同批 / 立即发出）' +
+    '<label class="restamp" style="margin-left:12px"><input type="checkbox" class="f-rest" checked> 波从震中重新发出（送达时改写到送达时刻）</label>' +
+  '</div>' +
+  '<div class="cardHint"></div>';
+  box.appendChild(div);
+  div.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',render));
+  const waveInp = div.querySelector('.f-wave');
+  if(waveInp) waveInp.addEventListener('input', ()=>{ updateWaveKm(div); render(); });
+  setNow(div.querySelector('.f-rt'),'rt');
+  setNow(div.querySelector('.f-st'),'st');
+  wireChecks(div);
+  render();
+  return div;
+}
+function renum(){
+  document.querySelectorAll('#cards .card b').forEach((b,i)=>b.textContent='第 '+(i+1)+' 报');
+}
+function reid(btn){
+  const c = btn.closest('.card');
+  c.querySelector('.f-id').value = 'EQ_'+Date.now();
+  render();
+}
+function setNow(el,kind){
+  el.value = nowJST();
+  render();
+}
+function preset(btn,kind){
+  const c = btn.closest('.card');
+  const q = s => c.querySelector(s);
+  if(kind==='eew'){ q('.f-csis').checked=true; q('.f-plum').checked=false; q('.f-final').checked=false; q('.f-cancel').checked=false; q('.f-rest').checked=true; }
+  if(kind==='plum'){ q('.f-plum').checked=true; q('.f-csis').checked=false; q('.f-final').checked=false; q('.f-rest').checked=true; }
+  if(kind==='final'){ q('.f-final').checked=true; q('.f-cancel').checked=false; q('.f-csis').checked=false; q('.f-rest').checked=false; }
+  if(kind==='cancel'){ q('.f-cancel').checked=true; q('.f-rest').checked=false; }
+  render();
+}
+function wireChecks(card){
+  const csis = card.querySelector('.f-csis');
+  const rest = card.querySelector('.f-rest');
+  const upd = ()=>{
+    const imi = card.querySelector('.f-imi').value;
+    const lgi = card.querySelector('.f-lgi').value;
+    const wv = parseFloat(card.querySelector('.f-wave').value);
+    let t = '';
+    if(csis.checked) t = 'isCSIS=true：maxIntensity 与 maxLgInt 将输出为空，由 EQuake 自行计算震度。';
+    else if(imi === '' || lgi === '') t = '「EQuake 计算」：震度留空，由 EQuake 根据震级与震中距自行推算（不写具体值、也不显示「不明」）。';
+    if(!isNaN(wv) && wv >= 0){ t += (t ? ' ' : '') + '震波已发出 ' + wv + ' 秒：送达时按此距离重发（波已向外扩约 ' + (wv * 7).toFixed(0) + ' km），不继着上一次波。'; }
+    else if(rest.checked) t += (t ? ' ' : '') + '波从震中重新发出：送达时刻改写发震时刻，波刚从震中出发。';
+    else t += (t ? ' ' : '') + '继着上一次地震波：送达时不重置，波接着上一报继续向外扩。';
+    card.querySelector('.cardHint').textContent = t;
+    render();
+  };
+  csis.addEventListener('change', upd);
+  rest.addEventListener('change', upd);
+  card.querySelector('.f-imi').addEventListener('change', upd);
+  card.querySelector('.f-lgi').addEventListener('change', upd);
+  upd();
+}
+function cardJson(card){
+  const q = s => card.querySelector(s);
+  const csis = q('.f-csis').checked;
+  const lat = parseFloat(q('.f-lat').value)||0;
+  const lng = parseFloat(q('.f-lng').value)||0;
+  return {
+    eventID: q('.f-id').value.trim() || 'EQ_UNKNOWN',
+    placeName: q('.f-place').value.trim(),
+    latitude: lat,
+    longitude: lng,
+    depth: parseFloat(q('.f-dep').value)||0,
+    reportTime: q('.f-rt').value.trim(),
+    shockTime: q('.f-st').value.trim(),
+    reportNum: parseInt(q('.f-num').value)||1,
+    magnitude: parseFloat(q('.f-mag').value)||0,
+    maxIntensity: csis ? '' : q('.f-imi').value,
+    maxLgInt: csis ? '' : q('.f-lgi').value,
+    isCSIS: csis,
+    isPLUM: q('.f-plum').checked,
+    isCancel: q('.f-cancel').checked,
+    isFinal: q('.f-final').checked,
+    sourceName: q('.f-src').value.trim() || 'UNKNOWN',
+    delaySec: Math.max(0, parseFloat(q('.f-delay').value) || 0),
+    reStamp: q('.f-rest').checked,
+    waveElapsed: (() => { const v = q('.f-wave').value.trim(); return v === '' ? null : Math.max(0, parseFloat(v) || 0); })()
+  };
+}
+function buildArray(){
+  const out = [];
+  document.querySelectorAll('#cards .card').forEach(c=>{
+    if(c.querySelector('.f-en').checked) out.push(cardJson(c));
+  });
+  return out;
+}
+function render(){
+  document.getElementById('preview').textContent = JSON.stringify(buildArray(),null,2);
+}
+// 发布前防呆校验：空时间/空 eventID 会直接让 EQuake 渲染异常（白屏、震中跑到极区）
+// 经纬度不再限制取值范围（任意数值均可发布，越界只做提醒，由 EQuake 自行解析）
+function validate(arr){
+  const errs = [];
+  arr.forEach((d,i)=>{
+    const n = i+1;
+    if(!(d.depth >= 0 && d.depth <= 700)) errs.push('第'+n+'报 depth='+d.depth+' 超出 0~700 km');
+    if(!(d.magnitude >= -1 && d.magnitude <= 10)) errs.push('第'+n+'报 magnitude='+d.magnitude+' 超出 -1~10');
+    if(!d.shockTime) errs.push('第'+n+'报 shockTime 为空，EQuake 无法定位震中');
+    if(!d.reportTime) errs.push('第'+n+'报 reportTime 为空');
+    if(!d.eventID || d.eventID === 'EQ_UNKNOWN') errs.push('第'+n+'报 eventID 未填写');
+    if(d.delaySec < 0 || d.delaySec > 3600) errs.push('第'+n+'报 延迟 '+d.delaySec+' 秒超出 0~3600');
+    if(d.isNaN && isNaN(d.latitude)) errs.push('第'+n+'报 纬度不是数字');
+  });
+  return errs;
+}
+// 统一投递入口：errs 非空则不发, 否则 POST 到服务器（useDelay=false 时立即发出）
+async function sendPlan(arr, useDelay, tag){
+  const errs = validate(arr);
+  if(errs.length){ msg((tag||'发布')+'已取消：'+errs.join('；'), false); return false; }
+  const warns = staleWarn(arr);
+  msg('正在发布…', true);
+  try{
+    const j = await postJson('/publish', JSON.stringify(arr), useDelay ? '' : '?immediate=1');
+    if(j.ok){
+      const sc = (j.schedule || []).map(s => '第' + s.i + '报' + (s.delaySec > 0 ? (' ' + s.delaySec + ' 秒后') : '立即')).join('、');
+      msg((tag||'发布')+'已排入 ' + j.count + ' 报：' + sc + '，EQuake 每秒轮询取走。', true);
+      if(warns.length) msg(warns.join('；'), true);
+      if(useDelay) startPlan();
+      return true;
+    }
+    msg((tag||'发布')+'失败：'+j.error,false);
+    return false;
+  }catch(e){ msg((tag||'发布')+'失败：'+(e.message||e),false); return false; }
+}
+async function publish(){
+  const arr = buildArray();
+  if(!arr.length){ msg('没有启用中的报文，先添加并启用至少一报。',false); return; }
+  const useDelay = !!document.getElementById('useDelay').checked;
+  if(await sendPlan(arr, useDelay, '发布')) { refreshSent(); }
+}
+
+// ---------- 本次已发出事件：继续加报 / 直接取消 ----------
+let SENT_ITEMS = [];   // /sent 流水（最新在最前）
+let QUEUE_ITEMS = [];  // 未投递队列（用于提示「取消会一并作废」）
+
+async function refreshSent(){
+  const box = document.getElementById('sentList');
+  if(!box) return;
+  if(!API){
+    box.innerHTML = '<div class="senterr">还没连上发报服务器（正在自动探测…）。确认 <code>启动服务器.bat</code> 在运行，连上后这里会自动列出已发出的地震。</div>';
+    return;
+  }
+  let s = null;
+  try{
+    const resp = await fetch(API + '/sent', { cache: 'no-store' });
+    if(!resp.ok) throw new Error('HTTP ' + resp.status);
+    s = await resp.json();
+  }catch(e){
+    box.innerHTML = '<div class="senterr">读不到已发记录（' + esc(String(e && e.message || e)) +
+      '）：请确认 <code>启动服务器.bat</code> 正在运行，且服务器是重启后的新版本。</div>';
+    return;
+  }
+  // 旧版服务器 /sent 会走数据兜底返回 []，不是 {ok,items} —— 这时面板没法用，明确提示重启服务器
+  if(!s || !Array.isArray(s.items)){
+    box.innerHTML = '<div class="senterr">服务器版本过旧，不支持「已发事件」查询（/sent 返回 ' +
+      JSON.stringify(s).slice(0, 80) + '）。请关闭旧窗口、双击 <code>启动服务器.bat</code> 重启后再刷新本页。</div>';
+    return;
+  }
+  SENT_ITEMS = s.items || [];
+  try{
+    const q = await (await fetch(API + '/queue', { cache: 'no-store' })).json();
+    QUEUE_ITEMS = q.queued || [];
+  }catch(e){ QUEUE_ITEMS = []; }
+  const hot = document.getElementById('sentList') && document.getElementById('sentList').closest('.sentbox');
+  if(hot) hot.classList.add('hot');
+  renderSent();
+}
+function kindTag(d){
+  if(d.isCancel) return '<span class="tag cancel">取消报</span>';
+  if(d.isFinal) return '<span class="tag final">最终报告</span>';
+  if(d.isPLUM) return '<span class="tag plum">PLUM</span>';
+  if(d.isCSIS) return '<span class="tag eew">EEW 速报</span>';
+  return '<span class="tag eew">普通报</span>';
+}
+function renderSent(){
+  const box = document.getElementById('sentList');
+  if(!box) return;
+  const cnt = document.getElementById('sentCount');
+  if(!SENT_ITEMS.length){
+    if(cnt) cnt.textContent = '（共 0 次地震 / 0 条报文）';
+    box.innerHTML = '<div class="senterr">还没有发布过任何报文：内容填好后点「📤 发布到服务器」，这里就会列出每一次地震，可继续加报或一键取消。</div>';
+    return;
+  }
+  const groups = {}, order = [];
+  SENT_ITEMS.forEach(d=>{
+    if(!groups[d.eventID]){ groups[d.eventID] = []; order.push(d.eventID); }
+    groups[d.eventID].push(d);
+  });
+  const totalReports = SENT_ITEMS.length;
+  if(cnt) cnt.textContent = '（共 ' + order.length + ' 次地震 / ' + totalReports + ' 条报文 · 序号 1=最旧，数字越大越新）';
+  const rtag = d => d.isCancel ? '取消' : d.isFinal ? '最终' : d.isPLUM ? 'PLUM' : d.isCSIS ? '速报' : '普通';
+  box.innerHTML = order.map((ev, i) => {
+    const list = groups[ev];               // 已是最新在前
+    const seq = order.length - i;          // 序号：最旧=1，依次递增，最新=order.length
+    const isNewest = i === 0, isOldest = i === order.length - 1, isOnly = order.length === 1;
+    const last = list[0]; // 最新一条
+    const arrived = list.filter(d => d.arrived).length;
+    const awaiting = list.filter(d => !d.arrived && !d.isCancel).length;
+    const pend = QUEUE_ITEMS.filter(q => q.eventID === ev);
+    const waitTxt = awaiting
+      ? ' <span class="tag pending">已发布，正在等 EQuake 取走（' + awaiting + ' 报）</span>'
+      : (pend.length ? ' <span class="tag pending">队列中还有 ' + pend.length + ' 报待发（' + pend.map(q=>q.etaSec+'秒').join('/') + '），取消本次地震会一并作废</span>' : '');
+    // 该事件下每一条报文都列出来（最新在前），避免多报序列被合并成一行而看不出全貌
+    const sub = list.map(d =>
+      '第' + d.reportNum + '报 M' + (d.magnitude == null ? '?' : d.magnitude) + ' ' + rtag(d) +
+      (d.arrived ? ' ✓' : ' ·待取')
+    ).join(' · ');
+    return '<div class="sentrow">' +
+      '<span class="seq" title="序号：最旧=1，依次递增，最新最大">' + seq + '</span>' +
+      (isOnly ? '<span class="seq-lbl new">最新</span><span class="seq-lbl old">最旧</span>'
+        : isNewest ? '<span class="seq-lbl new">最新</span>'
+        : isOldest ? '<span class="seq-lbl old">最旧</span>' : '') +
+      '<span class="id">' + esc(ev) + '</span>' + kindTag(last) +
+      (awaiting ? '' : '<span class="tag eew">✓ 已送达 EQuake</span>') +
+      '<span class="meta">M' + (last.magnitude == null ? '?' : last.magnitude) + ' · 深' + (last.depth == null ? '?' : last.depth) + 'km · ' +
+        (last.latitude == null ? '--' : last.latitude) + '/' + (last.longitude == null ? '--' : last.longitude) +
+        (last.placeName ? ' · ' + esc(last.placeName) : '') +
+        ' · 共 ' + list.length + ' 报（已送达 ' + arrived + (awaiting ? ' · 待送达 ' + awaiting : '') + '，最新 ' + esc(String(last.atText || '').slice(11)) + '）</span>' +
+      waitTxt +
+      '<span style="flex:1"></span>' +
+      '<button class="mini" onclick="moreReport(\'' + ev.replace(/'/g, "\\'") + '\')">＋ 继续加报</button>' +
+      '<button class="mini danger" onclick="cancelEvent(\'' + ev.replace(/'/g, "\\'") + '\')">✕ 取消本次地震</button>' +
+      '<div class="sentsub">' + esc(sub) + '</div>' +
+    '</div>';
+  }).join('');
+}
+// 点「＋ 继续加报」：弹出与常态发布完全相同的设置界面，由用户设好再发（eventID 默认锁定）
+let moreCard = null;
+let moreEventID = '';
+async function moreReport(ev){
+  const d = SENT_ITEMS.filter(x => x.eventID === ev)[0];
+  if(!d){ msg('服务器里找不到事件 ' + ev + ' 的记录（可能服务器已重启）。', false); return; }
+  openMore(ev);
+}
+function openMore(ev){
+  const d = SENT_ITEMS.filter(x => x.eventID === ev)[0];
+  if(!d){ msg('服务器里找不到事件 ' + ev + ' 的记录（可能服务器已重启）。', false); return; }
+  const nextNum = (parseInt(d.reportNum, 10) || 1) + 1;
+  moreEventID = ev;
+  const body = document.getElementById('moreBody');
+  const foot = document.getElementById('moreFoot');
+  body.innerHTML = '';
+  foot.innerHTML = '';
+  body.insertAdjacentHTML('afterbegin',
+    '<div class="maphead"><b>📍 在弹窗内地图选点</b> ' +
+    '<select id="moreBaseSel"><option value="amap">高德矢量</option><option value="amapsat">高德卫星</option><option value="osm">OpenStreetMap</option></select> ' +
+    '<span class="hint">点地图或拖动标记设置震中，坐标自动写回下方卡片</span></div>' +
+    '<div id="moreMap"></div>');
+  const c = addCard(body);
+  moreCard = c;
+  fillCard(c, {
+    eventID: d.eventID,
+    placeName: d.placeName,
+    latitude: d.latitude, longitude: d.longitude,
+    depth: d.depth, magnitude: d.magnitude,
+    reportTime: nowJST(), shockTime: d.shockTime || nowJST(),
+    reportNum: (parseInt(d.reportNum, 10) || 1) + 1,
+    maxIntensity: d.isCSIS ? '' : (d.maxIntensity == null ? '' : d.maxIntensity),
+    maxLgInt: d.isCSIS ? '' : (d.maxLgInt == null ? '' : d.maxLgInt),
+    isCSIS: !!d.isCSIS, isPLUM: !!d.isPLUM, isCancel: false, isFinal: !!d.isFinal,
+    sourceName: d.sourceName || 'JMA',
+    delaySec: 0
+  });
+  c.querySelector('.f-rest').checked = false; // 加报默认「继着上一次地震波」，不重置；要重发请在卡片里勾「波从震中重新发出」或填「震波已发出」秒数
+  c.querySelector('.f-wave').value = '';      // 留空 = 继续上一次波
+  // eventID 锁定为本次地震编号：去掉「换一个」按钮，并把输入框置灰只读
+  c.querySelectorAll('button').forEach(b=>{ if(/reid\(/.test(b.getAttribute('onclick') || '')) b.remove(); });
+  const idEl = c.querySelector('.f-id');
+  idEl.value = ev;
+  idEl.readOnly = true;
+  idEl.classList.add('locked');
+  c.querySelector('.head b').textContent = '加报 · 第 ' + nextNum + ' 报';
+  uniqInsert(body,
+    '<div class="modal-note">下面是与常态发布<b>完全相同</b>的设置界面，按需要改完再发送。' +
+    'eventID 已锁定为本次地震编号 <code>' + esc(ev) + '</code>（编号不变 EQuake 才认作同一次地震的续报）；' +
+    '确要另起一个编号再发，勾下面的开关。</div>' +
+    '<div style="margin:0 0 6px"><label class="chk" style="color:var(--txt)">' +
+    '<input type="checkbox" id="moreUnlockId"> 允许修改 eventID（一般不用勾）</label></div>');
+  const un = document.getElementById('moreUnlockId');
+  if(un) un.addEventListener('change', ()=>{
+    idEl.readOnly = !un.checked;
+    idEl.classList.toggle('locked', !un.checked);
+    if(!un.checked && idEl.value.trim() !== ev) idEl.value = ev;
+  });
+  foot.innerHTML =
+    '<div class="seriesline"><b>🎲 生成多报序列</b>' +
+      '共 <input type="number" id="srN" value="6" min="2" max="99"> 报 ' +
+      '<select id="srNMode"><option value="exact">精确</option><option value="approx" selected>大约</option></select> ' +
+      '每报间隔 <input type="number" id="srG" value="4" min="0" max="600"> 秒 ' +
+      '<select id="srGMode"><option value="exact">精确</option><option value="approx" selected>大约</option></select> ' +
+      '<button class="mini" onclick="genSeries()">生成到下方卡片区</button>' +
+      '<span class="hint">先在上面把<b>最终数值</b>设好（震级/震中/深度/震度/类型），再点这里：' +
+      '程序会按报数生成一串由弱到强、数值来回飘的报，震中逐步收敛，<b>末报与你设定的最终数值完全一致</b>；' +
+      '生成后可再逐张微调，确认后点「📤 发布到服务器」。</span>' +
+    '</div>' +
+    '<button class="mini" onclick="syncMore()">⇄ 用主页面当前坐标</button>' +
+    '<button class="mini" onclick="setNow(moreCard.querySelector(\'.f-rt\'),\'rt\')">发布时刻=现在</button>' +
+    '<button class="mini" onclick="setNow(moreCard.querySelector(\'.f-st\'),\'st\')">发震时刻=现在</button>' +
+    '<span style="flex:1"></span>' +
+    '<button onclick="closeMore()">取消</button>' +
+    '<button class="primary" onclick="sendMore()">📤 发出这一报</button>';
+  document.getElementById('moreEv').textContent = '本次地震编号 ' + ev + ' · 将作为第 ' + nextNum + ' 报';
+  document.getElementById('moreModal').classList.add('on');
+  render();
+  initMoreMap();
+}
+// 弹窗里插到卡片上方（用存在性判断避免重复插入）
+function uniqInsert(host, html){
+  if(host.querySelector('.modal-note')) return;
+  host.insertAdjacentHTML('afterbegin', html);
+}
+async function sendMore(){
+  if(!moreCard || !moreCard.isConnected){ closeMore(); return; } // 卡片被弹窗里的「删除」删掉了
+  const data = cardJson(moreCard);
+  const okSend = await sendPlan([data], false, '加报'); // 校验不通过时 sendPlan 会提示且不发, 弹窗保留用户已填内容
+  if(okSend){
+    msg('已加报：' + data.eventID + ' 第 ' + data.reportNum + ' 报已排入（reStamp=' + data.reStamp + '），EQuake 下一秒取走。', true);
+    closeMore();
+    refreshSent();
+  }
+}
+// 免责声明弹窗：HTML 里默认带 class="on"，每次进入页面都会先弹出来，点确认才关闭（不做记忆，每次都弹）
+function closeDisc(){
+  const el = document.getElementById('discModal');
+  if(el) el.classList.remove('on');
+}
+function closeMore(){
+  const m = document.getElementById('moreModal');
+  if(m) m.classList.remove('on');
+  if(moreMap){ try{ moreMap.remove(); }catch(e){} moreMap = null; moreMarker = null; moreBaseLayer = null; }
+  const body = document.getElementById('moreBody');
+  if(body) body.innerHTML = '';
+  moreCard = null;
+}
+// ---------- 多报序列：用户定最终值 → 由弱到强、带随机浮动、末报精确收敛 ----------
+// 时间戳 -> UTC+9 时间串（与 nowJST 同一口径）
+function msToJST(ms){
+  const d = new Date(ms + (9*60 + new Date(ms).getTimezoneOffset())*60000);
+  const p = n => String(n).padStart(2,'0');
+  return d.getFullYear()+'/'+p(d.getMonth()+1)+'/'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds());
+}
+// fin = 用户设定的最终数值；opt = {n 报数, nApprox 大约?, gap 每报间隔秒, gapApprox 大约?, rest 是否 reStamp}
+// 首报比最终低几级、随机浮动幅度由程序按报数自动给出，用户不再手填
+function makeSeries(fin, opt){
+  const wantN = Math.max(2, Math.min(99, parseInt(opt.n, 10) || 4));
+  const N = opt.nApprox
+    ? Math.max(2, Math.min(99, Math.round(wantN * (0.7 + 0.6 * Math.random()))))  // 大约：在填的数附近浮动
+    : wantN;
+  const gapBase = Math.max(0, parseFloat(opt.gap) || 0);
+  const dMag = opt.nApprox ? (0.8 + 0.7 * Math.random()) : 1.0;    // 首报比最终偏弱
+  const upAllow = opt.nApprox ? (0.5 + 0.6 * Math.random()) : 0.6;  // 允许中间报比最终值还大（冲高再回落）
+  const jit  = opt.nApprox ? (0.14 + 0.10 * Math.random()) : 0.16;  // 飘忽幅度，始终非零
+  const magLow = Math.max(-1, Math.min(10, fin.magnitude - dMag));
+  const magHi  = Math.min(10, fin.magnitude + upAllow); // 上探包络：可超过用户填的最终值
+  const iEnd = selI.indexOf(fin.maxIntensity);
+  const lEnd = selL.indexOf(fin.maxLgInt);
+  const rnd = a => (Math.random()*2 - 1) * a;
+  const t0 = Date.now();
+  // 震级序列：以最终值为中心、在 [magLow, magHi] 上下包络里随机摆动（约 35% 概率反转方向），
+  // 中间报可高于或低于最终值（偶尔冲高再回落），末报强制精确收束到用户设定的最终值
+  const span = magHi - magLow;
+  const mags = [magLow];
+  let cur = magLow, dir = Math.random() < 0.5 ? 1 : -1;
+  for(let k = 2; k < N; k++){
+    const swing = span * (0.10 + 0.12 * Math.random()) + jit;
+    if(Math.random() < 0.35) dir = -dir;
+    cur += dir * swing;
+    if(cur < magLow) cur = magLow + swing * Math.random();
+    if(cur > magHi)  cur = magHi  - swing * Math.random();
+    mags.push(cur);
+  }
+  mags.push(fin.magnitude);
+  const out = [];
+  let acc = 0;
+  for(let k = 1; k <= N; k++){
+    const f = k / N, last = (k === N);
+    const mg = Math.max(magLow, Math.min(10, mags[k - 1]));
+    let imi = fin.maxIntensity, lgi = fin.maxLgInt;
+    if(!last && iEnd > 0) imi = selI[Math.max(0, iEnd - (N - k) - (Math.random() < 0.25 ? 1 : 0))];
+    if(!last && lEnd > 0) lgi = selL[Math.max(0, lEnd - Math.round((N - k) * 0.6) - (Math.random() < 0.25 ? 1 : 0))];
+    const off = 0.9 * Math.pow(1 - f, 1.2);
+    const dt = (k === 1) ? 0 : (opt.gapApprox ? Math.max(0, gapBase * (0.6 + 0.9 * Math.random())) : gapBase); // 大约：间隔也飘忽
+    acc += dt;
+    out.push({
+      eventID: fin.eventID, placeName: fin.placeName, sourceName: fin.sourceName,
+      latitude:  last ? fin.latitude  : +(fin.latitude  + rnd(off)).toFixed(2),
+      longitude: last ? fin.longitude : +(fin.longitude + rnd(off)).toFixed(2),
+      depth: last ? fin.depth : Math.max(1, Math.round(fin.depth + rnd(12 * Math.pow(1-f, 1.2)))),
+      magnitude: +mg.toFixed(1),
+      reportTime: msToJST(t0 + acc * 1000),
+      shockTime: fin.shockTime,
+      reportNum: (parseInt(fin.reportNum, 10) || 1) + (k - 1),
+      maxIntensity: fin.isCSIS ? '' : imi,
+      maxLgInt: fin.isCSIS ? '' : lgi,
+      isCSIS: fin.isCSIS, isPLUM: fin.isPLUM,
+      isFinal: last ? fin.isFinal : false,
+      isCancel: false,
+      delaySec: dt,
+      reStamp: (k === 1) ? !!opt.rest : false, // 仅首报按「重新发出」锚定；后续报继着上一次波，波持续向外扩不重置
+      waveElapsed: (k === 1) ? fin.waveElapsed : null
+    });
+  }
+  return out;
+}
+function genSeries(){
+  if(!moreCard || !moreCard.isConnected){ closeMore(); return; }
+  const fin = cardJson(moreCard);
+  const opt = {
+    n: document.getElementById('srN').value,
+    nApprox: document.getElementById('srNMode').value === 'approx',
+    gap: document.getElementById('srG').value,
+    gapApprox: document.getElementById('srGMode').value === 'approx',
+    rest: moreCard.querySelector('.f-rest').checked
+  };
+  const series = makeSeries(fin, opt);
+  const host = document.getElementById('cards');
+  if(host.children.length && !confirm('主页面上已有 ' + host.children.length + ' 张卡片，生成多报会先清空它们，继续？')) return;
+  host.innerHTML = '';
+  series.forEach(d => {
+    const c = addCard();
+    fillCard(c, d);
+    c.querySelector('.f-rest').checked = !!d.reStamp;
+    c.querySelector('.f-en').checked = true;
+  });
+  renum(); render();
+  closeMore();
+  const f1 = series[0], fN = series[series.length - 1];
+  msg('已按「' + fin.eventID + '」生成 ' + series.length + ' 报：第 ' + f1.reportNum + ' 报 M' + f1.magnitude.toFixed(1) +
+      ' → 第 ' + fN.reportNum + ' 报 M' + fN.magnitude.toFixed(1) + '（末报 = 你设定的最终数值，每报间隔 ' +
+      (parseFloat(opt.gap) || 0) + ' 秒）。检查无误后点「📤 发布到服务器」。', true);
+}
+// 主页面独立入口：取卡片区第一张作为「最终报」模板，生成由弱到强、数值来回飘的多报序列
+function genSeriesMain(){
+  const host = document.getElementById('cards');
+  const cards = Array.from(host.querySelectorAll('.card'));
+  if(!cards.length){
+    msg('先在上方卡片区「＋ 添加一报」并填好最终报（震级/震中/深度/震度/类型设成最终想要的、勾好「波从震中重新发出」），再点生成多报序列。', false);
+    return;
+  }
+  const finCard = cards[0];                 // 以第一张作为最终报模板
+  const fin = cardJson(finCard);
+  const restEl = finCard.querySelector('.f-rest');
+  const opt = {
+    n: document.getElementById('msN').value,
+    nApprox: document.getElementById('msNMode').value === 'approx',
+    gap: document.getElementById('msG').value,
+    gapApprox: document.getElementById('msGMode').value === 'approx',
+    rest: restEl ? restEl.checked : true
+  };
+  const series = makeSeries(fin, opt);
+  host.innerHTML = '';
+  series.forEach(d => {
+    const c = addCard();
+    fillCard(c, d);
+    c.querySelector('.f-rest').checked = !!d.reStamp;
+    c.querySelector('.f-en').checked = true;
+  });
+  renum(); render();
+  const f1 = series[0], fN = series[series.length - 1];
+  msg('已生成 ' + series.length + ' 报：第 ' + f1.reportNum + ' 报 M' + f1.magnitude.toFixed(1) +
+      ' → 第 ' + fN.reportNum + ' 报 M' + fN.magnitude.toFixed(1) + '（末报 = 你设定的最终数值）。可逐张微调后点「📤 发布到服务器」。', true);
+}
+// 地图在主页面（弹窗遮住它），所以提供「把主页面当前坐标搬过来」的按钮
+function syncMore(){
+  if(!moreCard) return;
+  const main = document.querySelector('#cards .card:last-child');
+  if(!main) return;
+  const la = main.querySelector('.f-lat').value, lo = main.querySelector('.f-lng').value;
+  moreCard.querySelector('.f-lat').value = la;
+  moreCard.querySelector('.f-lng').value = lo;
+  render();
+  if(moreMap) redrawMoreMarker();
+  msg('已同步主页面坐标（' + la + ', ' + lo + '），可在弹窗里再手动微调。', true);
+}
+// ---------- 弹窗内独立地图：点选/拖拽设置震中，写回弹窗卡片 ----------
+function applyMoreBase(mode){
+  if(!moreMap) return;
+  const t = TILES[mode];
+  if(!t) return;
+  moreBaseMode = mode;
+  if(moreBaseLayer) moreMap.removeLayer(moreBaseLayer);
+  const opt = { maxZoom: t.max, minZoom: 3, attribution: t.attr };
+  if(t.sub) opt.subdomains = t.sub;
+  moreBaseLayer = L.tileLayer(t.url, opt).addTo(moreMap);
+  moreMap.setMaxZoom(t.max);
+}
+function switchMoreBase(mode){
+  if(!moreMap || mode === moreBaseMode) return;
+  const c = moreMap.getCenter();
+  const w = fromDisplay(c.lat, c.lng, moreBaseMode); // 旧底图坐标 -> WGS
+  applyMoreBase(mode);
+  moreMap.setView(toDisplay(w[0], w[1], moreBaseMode), moreMap.getZoom());
+  redrawMoreMarker();
+}
+function setMoreMarker(dlat, dlng){
+  if(!moreMap) return;
+  if(!moreMarker){
+    // interactive:false —— 与主地图保持一致：点选稳定，标记不吞点击
+    moreMarker = L.marker([dlat, dlng], { interactive: false }).addTo(moreMap);
+  } else {
+    moreMarker.setLatLng([dlat, dlng]);
+  }
+}
+function writeMoreLatLng(lat, lng){
+  if(!moreCard) return;
+  moreCard.querySelector('.f-lat').value = lat.toFixed(2);
+  moreCard.querySelector('.f-lng').value = lng.toFixed(2);
+  render();
+}
+function redrawMoreMarker(){
+  if(!moreMap || !moreCard) return;
+  const lat = parseFloat(moreCard.querySelector('.f-lat').value);
+  const lng = parseFloat(moreCard.querySelector('.f-lng').value);
+  if(isFinite(lat) && isFinite(lng)) setMoreMarker.apply(null, toDisplay(lat, lng, moreBaseMode));
+}
+function initMoreMap(){
+  if(moreMap){ try{ moreMap.remove(); }catch(e){} moreMap = null; moreMarker = null; moreBaseLayer = null; }
+  moreBaseMode = 'amap';
+  const lat = parseFloat(moreCard.querySelector('.f-lat').value);
+  const lng = parseFloat(moreCard.querySelector('.f-lng').value);
+  let clat = 35.68, clng = 139.76; // 默认日本附近（无坐标时）
+  if(isFinite(lat) && isFinite(lng)){ clat = lat; clng = lng; }
+  try{
+    moreMap = L.map('moreMap', { center: toDisplay(clat, clng, moreBaseMode), zoom: 5, minZoom: 3 });
+    applyMoreBase(moreBaseMode);
+    moreMap.on('click', e => {
+      const w = fromDisplay(e.latlng.lat, e.latlng.lng, moreBaseMode); // w = [纬度, 经度]
+      const lat = Math.round(w[0] * 100) / 100, lng = Math.round(w[1] * 100) / 100;
+      setMoreMarker.apply(null, toDisplay(lat, lng, moreBaseMode));
+      writeMoreLatLng(lat, lng);
+    });
+    setMoreMarker.apply(null, toDisplay(clat, clng, moreBaseMode));
+    const mEl = document.getElementById('moreBaseSel');
+    if(mEl) mEl.addEventListener('change', ev => switchMoreBase(ev.target.value));
+    setTimeout(()=>{ if(moreMap) moreMap.invalidateSize(); }, 60); // 弹窗由 display:none 变可见，需重算尺寸
+  }catch(e){ /* 地图加载失败也不影响手动输入坐标 */ }
+}
+// 直接取消本次地震：立即发一条 isCancel 报（同 eventID），并作废排队中的后续报文
+async function cancelEvent(ev){
+  const d = SENT_ITEMS.filter(x => x.eventID === ev)[0];
+  if(!confirm('确认取消本次地震「' + ev + '」？\n将立即向 EQuake 发出一条取消报（同一 eventID），作废排队中的后续报文，并从「本次已发出」列表移除该地震。')) return;
+  const body = { eventID: ev };
+  if(d){
+    body.placeName = d.placeName;
+    body.latitude = d.latitude; body.longitude = d.longitude;
+    body.depth = d.depth; body.magnitude = d.magnitude;
+    body.reportNum = (parseInt(d.reportNum, 10) || 1) + 1;
+    body.sourceName = d.sourceName || 'JMA';
+  }
+  try{
+    if(!apiReady) await findServer();
+    const j = await postJson('/cancelEvent', JSON.stringify(body));
+    if(j.ok){
+      msg('已取消本次地震「' + ev + '」：已向 EQuake 发出取消报（排队中的后续报文已作废），并已从列表中移除。', true);
+      refreshPlan(); refreshSent();
+    } else msg('取消失败：' + j.error, false);
+  }catch(e){ msg('取消失败：' + (e.message || e), false); }
+}
+// 队列倒计时显示
+let planTimer = null;
+function startPlan(){
+  stopPlan();
+  refreshPlan();
+  if(!planTimer) planTimer = setInterval(refreshPlan, 1000);
+}
+function stopPlan(){
+  if(planTimer){ clearInterval(planTimer); planTimer = null; }
+  const el = document.getElementById('planInfo');
+  if(el) el.textContent = '';
+}
+async function refreshPlan(){
+  try{
+    const r = await fetch(API + '/queue', { cache: 'no-store' });
+    const j = await r.json();
+    const q = j.queued || [];
+    const el = document.getElementById('planInfo');
+    if(!q.length){ el.textContent = ''; stopPlan(); return; }
+    el.textContent = '⏱ 投递队列：' + q.map(s => '第' + s.i + '报 ' + s.etaSec + ' 秒后送达（' + s.atText.slice(11) + (s.willRestamp ? ' 波从震中发出' : '') + '）').join('，') + '（EQuake 每次只取一条，取完自动推进）';
+  }catch(e){ /* 服务器临时不可达, 保持静默 */ }
+}
+async function clearSrv(){
+  try{
+    await postJson('/clear', undefined);
+    stopPlan(); refreshSent();
+    msg('已清空（包括未投递的排队报文），轮询将返回空数组 []。',true);
+  }catch(e){ msg('清空失败：'+(e.message||e),false); }
+}
+function msg(t,ok){
+  const m = document.getElementById('msg');
+  m.textContent = t; m.className = ok?'ok':'err';
+  clearTimeout(m._t); m._t = setTimeout(()=>{m.textContent='';},6000);
+}
+function copyJson(){ navigator.clipboard.writeText(JSON.stringify(buildArray(),null,2)).then(()=>msg('JSON 已复制。',true)); }
+function copySub(){
+  const t = document.getElementById('subUrl').textContent;
+  if(t.indexOf('http') !== 0){ msg('服务器未连接，先启动 启动服务器.bat。',false); return; }
+  navigator.clipboard.writeText(t).then(()=>msg('订阅地址已复制。',true));
+}
+function goCity(lat, lng){
+  if(map){
+    map.setView(toDisplay(lat, lng), 6);
+    setMarker.apply(null, toDisplay(lat, lng));
+  }
+  document.querySelectorAll('#cards .card').forEach(c=>{
+    c.querySelector('.f-lat').value = lat;
+    c.querySelector('.f-lng').value = lng;
+  });
+  render();
+}
+
+function mapFallbackUI(){
+  document.getElementById('map').style.display='none';
+  document.getElementById('mapFallback').style.display='flex';
+  const bs = document.getElementById('baseSel');
+  if(bs) bs.style.display='none';
+}
+function ensureLeaflet(cb){
+  if(typeof L !== 'undefined'){ cb(true); return; }
+  const list = [
+    'https://cdn.staticfile.org/leaflet/1.9.4/leaflet.js',
+    'https://unpkg.com/leaflet@1.9.4/leaflet.js'
+  ];
+  let i = 0;
+  const next = ()=>{
+    if(i >= list.length){ cb(false); return; }
+    const s = document.createElement('script');
+    s.src = list[i++];
+    s.onload = ()=> cb(typeof L !== 'undefined');
+    s.onerror = next;
+    document.head.appendChild(s);
+  };
+  next();
+}
+function initMap(){
+  try{
+    map = L.map('map',{ center: toDisplay(33.0,132.0), zoom: 5, minZoom: 3 });
+    applyBase('amap');
+    map.on('click', e=>{
+      const w = fromDisplay(e.latlng.lat, e.latlng.lng); // w = [纬度, 经度]
+      const lat = Math.round(w[0]*100)/100, lng = Math.round(w[1]*100)/100;
+      setMarker.apply(null, toDisplay(lat, lng));
+      writeLatLng(lat, lng);
+    });
+    setMarker.apply(null, toDisplay(35.68,139.76));
+    document.getElementById('baseSel').addEventListener('change', ev=>switchBase(ev.target.value));
+    setTimeout(()=>{ if(map) map.invalidateSize(); }, 250); // 布局稳定后重算尺寸，避免点击落点偏移
+  }catch(e){ mapFallbackUI(); }
+}
+
+// 官方格式示例（青森県東方沖）: 用于对照验证 EQuake 链路
+const SAMPLES = [{
+  eventID: 'JMA_202512262525',
+  placeName: '青森県東方沖',
+  latitude: 41.1, longitude: 142.6, depth: 10,
+  reportTime: '2025/12/26 25:25:00', shockTime: '2025/12/26 25:24:00',
+  reportNum: 1, magnitude: 0,
+  maxIntensity: '不明', maxLgInt: '不明',
+  isCSIS: false, isPLUM: false, isCancel: false, isFinal: false,
+  sourceName: 'JMA'
+}, {
+  // 演示：同一事件 30 秒后的最终报告（延迟 30 秒投递）
+  eventID: 'JMA_202512262525',
+  placeName: '青森県東方沖',
+  latitude: 41.1, longitude: 142.6, depth: 10,
+  reportTime: '2025/12/26 25:25:32', shockTime: '2025/12/26 25:24:00',
+  reportNum: 2, magnitude: 4.5,
+  maxIntensity: '3', maxLgInt: '1',
+  isCSIS: false, isPLUM: false, isCancel: false, isFinal: true,
+  sourceName: 'JMA',
+  delaySec: 30
+}];
+function fillCard(c, d){
+  const q = s => c.querySelector(s);
+  q('.f-id').value = d.eventID;
+  q('.f-place').value = d.placeName;
+  q('.f-lat').value = d.latitude;
+  q('.f-lng').value = d.longitude;
+  q('.f-dep').value = d.depth;
+  q('.f-mag').value = d.magnitude;
+  q('.f-rt').value = d.reportTime;
+  q('.f-st').value = d.shockTime;
+  q('.f-num').value = d.reportNum;
+  q('.f-imi').value = (d.maxIntensity == null ? '' : d.maxIntensity); // null/undefined -> 空 = 「EQuake 计算」
+  q('.f-lgi').value = (d.maxLgInt == null ? '' : d.maxLgInt);
+  q('.f-csis').checked = d.isCSIS;
+  q('.f-plum').checked = d.isPLUM;
+  q('.f-cancel').checked = d.isCancel;
+  q('.f-final').checked = d.isFinal;
+  q('.f-src').value = d.sourceName;
+  q('.f-delay').value = d.delaySec || 0;
+  q('.f-wave').value = (d.waveElapsed === null || d.waveElapsed === undefined) ? '' : d.waveElapsed;
+  updateWaveKm(c);
+}
+// 震波已发出(秒) -> 估算已向外扩散的公里数（按约 7 km/s 的波速，仅作直观提示）
+function updateWaveKm(card){
+  const inp = card && card.querySelector && card.querySelector('.f-wave');
+  const span = card && card.querySelector && card.querySelector('.wavekm');
+  if(!inp || !span) return;
+  const v = inp.value.trim();
+  if(v === ''){ span.textContent = ''; return; }
+  const s = parseFloat(v);
+  if(!isFinite(s) || s < 0){ span.textContent = ''; return; }
+  const km = s * 7;
+  span.textContent = '≈ ' + (km >= 100 ? km.toFixed(0) : km.toFixed(1)) + ' km（按 ~7 km/s 估算）';
+}
+function loadSample(){
+  document.getElementById('cards').innerHTML = '';
+  SAMPLES.forEach(d=>{ fillCard(addCard(), d); });
+  renum(); render();
+  msg('已载入官方示例（①青森県東方沖 M0.0 速报 立即发出 → ②同一事件 30 秒后最终报告），点「发布到服务器」看 EQuake 反应。', true);
+}
+async function toggleLog(){
+  const p = document.getElementById('logPanel');
+  if(p.style.display === 'block'){ p.style.display = 'none'; return; }
+  p.style.display = 'block';
+  p.textContent = 'loading...';
+  try{
+    if(!apiReady) await findServer();
+    if(!API){ p.textContent = 'server not connected, cannot read log.'; return; }
+    let t = await (await fetch(API + '/log?client=1&n=40', { cache: 'no-store' })).text();
+    if(t.indexOf('no matching requests') >= 0){
+      t = '(没有来自 EQuake 等客户端的请求记录, 下面是最近 15 条全部请求)\n\n' +
+          await (await fetch(API + '/log?n=15', { cache: 'no-store' })).text();
+    }
+    let data = '';
+    try{
+      const rr = await fetch(API + '/state', { cache: 'no-store' });
+      const st = await rr.json();
+      data = '\n---- 服务器当前已送达的报文 (' + (st.current || []).length + ' 条) / 队列 ' + ((st.queued || []).length) + ' 条 ----\n' +
+             JSON.stringify(st.current, null, 2).slice(0, 2000);
+    }catch(e){}
+    p.textContent = t + data;
+  }catch(e){ p.textContent = 'log fetch failed: ' + e; }
+}
+
+const dl = document.createElement('datalist'); dl.id='srcList';
+dl.innerHTML = ['JMA','CENC','USGS','SC','CEIC','FJ','TW','KMA','PTWC'].map(x=>'<option value="'+x+'">').join('');
+document.body.appendChild(dl);
+
+window.addEventListener('DOMContentLoaded',()=>{
+  addCard();
+  ensureLeaflet(ok=>{ if(ok) initMap(); else mapFallbackUI(); });
+  // 服务器探测与心跳
+  findServer();
+  document.addEventListener('keydown', e=>{ if(e.key === 'Escape') closeMore(); }); // Esc 关闭加报弹窗
+  const beat = async()=>{
+    if(!API){ findServer(); refreshSent(); return; } // 探测期间也要把栏位状态刷出来
+    try{
+      const r = await fetch(API + '/health', { cache: 'no-store' });
+      const j = await r.json();
+      apiReady = true; applyApi();
+      const cli = document.getElementById('cli');
+      if(j.clientHits > 0){
+        cli.textContent = 'EQuake 取数 ' + j.clientHits + ' 次 · 最近 ' + j.clientLast + ' 请求 ' + (j.clientPath || '');
+      }else{
+        cli.textContent = 'EQuake 还没来取过数据';
+      }
+    }catch(e){ apiReady = false; applyApi(); }
+    refreshSent();
+  };
+  setInterval(beat, 4000);
+});
+</script>
+</body>
+</html>
