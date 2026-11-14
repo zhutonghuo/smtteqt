@@ -22,15 +22,35 @@ button.mini{padding:2px 8px;font-size:12px;border-radius:4px}
 #dot{width:10px;height:10px;border-radius:50%;background:#bbb;display:inline-block;vertical-align:-1px}
 #dot.on{background:var(--ok)}
 main{padding:14px 18px;max-width:1100px;margin:0 auto}
-#map{height:360px;border-radius:8px;border:1px solid var(--line);z-index:1}
+#pickMap{height:420px;border-radius:8px;border:1px solid var(--line);z-index:1;background:#eaf0f6}
 #moreMap{height:300px;border-radius:8px;border:1px solid var(--line);z-index:1;margin:0 0 10px;background:#eaf0f6}
 .maphead{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 6px;font-size:13px}
 .maphead select{font-size:12px;padding:3px 6px;border-radius:5px;border:1px solid var(--line);background:var(--card);color:var(--txt)}
-#mapFallback{display:none;height:360px;border-radius:8px;border:1px dashed var(--warn);color:var(--warn);align-items:center;justify-content:center;text-align:center;padding:20px}
+#pickFallback{display:none;height:420px;border-radius:8px;border:1px dashed var(--warn);color:var(--warn);align-items:center;justify-content:center;text-align:center;padding:20px}
 .mapWrap{position:relative}
-#baseSel{position:absolute;top:10px;right:10px;z-index:1100;width:auto;background:#fff;border:1px solid var(--line);border-radius:6px;padding:4px 8px;font-size:13px;box-shadow:0 1px 6px rgba(0,0,0,.15)}
-.legend{position:absolute;left:10px;bottom:10px;z-index:1100;background:rgba(255,255,255,.92);border:1px solid var(--line);border-radius:6px;padding:4px 8px;font-size:12px;color:var(--sub)}
 .cities{margin:8px 0 4px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+/* 自定义预设弹窗里的内联选点地图（不另开弹窗，点完直接写回经纬度输入框） */
+#qpeMap{height:260px;border-radius:8px;border:1px solid var(--line);z-index:1;background:#eaf0f6}
+#qpeFallback{display:none;height:260px;border-radius:8px;border:1px dashed var(--warn);color:var(--warn);align-items:center;justify-content:center;text-align:center;padding:20px}
+.qpe-map{margin:10px 0 2px;border-top:1px dashed var(--line);padding-top:10px}
+/* 地图选点·地点搜索 */
+.place-search{position:relative;margin:6px 0 4px}
+.place-search input{width:100%;padding:6px 9px;border:1px solid var(--line);border-radius:6px;font-size:13px;color:var(--txt);background:#fff}
+.place-search input:focus{outline:none;border-color:var(--acc)}
+.place-results{margin-top:4px;max-height:184px;overflow:auto;border:1px solid var(--line);border-radius:6px;background:var(--card);display:none;z-index:30;box-shadow:0 4px 14px rgba(0,0,0,.08)}
+.place-results.on{display:block}
+.place-item{padding:6px 10px;font-size:13px;cursor:pointer;display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid #f0f0f0;align-items:center}
+.place-item:last-child{border-bottom:none}
+.place-item:hover{background:#eaf1fd}
+.place-item .pl-name{font-weight:600}
+.place-item .pl-ll{color:var(--sub);font-family:Consolas,monospace;font-size:12px}
+/* 工作区存档管理列表 */
+.wsrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 0;border-top:1px dashed var(--line)}
+.wsrow:first-of-type{border-top:none}
+.wsrow.cur{background:#eaf1fd;border-radius:6px;padding-left:10px;padding-right:10px}
+.wsrow b{font-size:14px}
+.wsrow .wsseq{display:inline-block;min-width:20px;text-align:center;font-family:Consolas,monospace;font-weight:700;background:#1565c0;color:#fff;border-radius:4px;padding:1px 6px}
+#wsImport{width:100%;font:12px/1.5 Consolas,monospace;padding:6px 8px;border:1px solid var(--line);border-radius:5px;resize:vertical}
 .hint{color:var(--sub);font-size:12px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin:12px 0}
 .card .head{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
@@ -39,7 +59,16 @@ main{padding:14px 18px;max-width:1100px;margin:0 auto}
 label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--sub)}
 input[type=text],input[type=number],select{border:1px solid var(--line);border-radius:5px;padding:5px 7px;font-size:13px;color:var(--txt);background:#fff;width:100%}
 input:focus,select:focus{outline:none;border-color:var(--acc)}
-.rowflex{display:flex;gap:6px;align-items:center}
+/* 一格里「输入框 + 小按钮」横排：输入框必须能收窄（全局 input{width:100%} 会把按钮顶出可视区），
+   实在放不下就让按钮换行，绝不能挤没了 */
+.rowflex{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.rowflex input[type=text]{flex:1 1 120px;min-width:0;width:auto}
+.rowflex .mini{flex:0 0 auto;white-space:nowrap}
+/* 时刻同步：开关高亮 + 被联动的输入框染个底色，一眼看得出「这个框是跟着走的」 */
+.chk.hi{border:1px solid #bcd4f0;background:#f2f8ff;border-radius:6px;padding:1px 7px 1px 5px}
+input.linked{background:#eef5ff}
+button.f-synct{font-size:11px;padding:1px 6px}
+button.f-synct.free{border-color:#c8a86b;background:#fff8ea;color:#8a5a00;font-weight:700}
 .chkline{display:flex;flex-wrap:wrap;gap:14px;margin-top:8px;font-size:13px}
 .chkline label{flex-direction:row;align-items:center;color:var(--txt)}
 .cardHint{font-size:12px;color:var(--sub);margin-top:6px;border-top:1px dashed var(--line);padding-top:6px}
@@ -65,6 +94,7 @@ input:focus,select:focus{outline:none;border-color:var(--acc)}
 .tag{display:inline-block;font-size:11px;border-radius:4px;padding:1px 6px;border:1px solid var(--line);color:var(--sub)}
 .tag.eew{color:#1565c0;border-color:#c3d9f2;background:#eef4ff}
 .tag.final{color:#00695c;border-color:#bfe3da;background:#eafaf6}
+.tag.official{color:#0d47a1;border-color:#9fc2f0;background:#e8f0fe;font-weight:700}
 .tag.plum{color:#6a1b9a;border-color:#e0ccf0;background:#f7f0ff}
 .tag.cancel{color:var(--warn);border-color:#f3c2bd;background:#fdecea}
 .tag.pending{color:#8a5a00;border-color:#f0d9b5;background:#fff8ec}
@@ -84,6 +114,24 @@ input:focus,select:focus{outline:none;border-color:var(--acc)}
 .disc-sub{font-size:12px;line-height:1.8;color:var(--sub);margin-top:10px}
 .seriesline{flex-basis:100%;display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;color:var(--txt);background:#f7f9fc;border:1px dashed var(--line);border-radius:6px;padding:8px 10px;margin-bottom:4px}
 .seriesline input{width:62px;padding:3px 6px;border:1px solid var(--line);border-radius:4px}
+.seriesline .ms-frow{flex-basis:100%;display:flex;align-items:center;gap:6px}
+.seriesline .ms-frow input{width:300px;max-width:60%;padding:4px 7px;font-size:13px;font-family:ui-monospace,Menlo,Consolas,monospace}
+.seriesline .ms-frow .mini{flex:0 0 auto}
+.tabbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0 4px;padding:6px 8px;background:#f7f9fc;border:1px dashed var(--line);border-radius:6px}
+.tabbar .tab{display:flex;align-items:center;gap:5px;padding:4px 9px;border:1px solid var(--line);border-radius:6px;background:#fff;cursor:pointer;font-size:12px;color:var(--txt)}
+.tabbar .tab:hover{border-color:#8ab}
+.tabbar .tab.on{background:#e8f1ff;border-color:#6b9bd8;color:#12396b;font-weight:700}
+.tabbar .tab .tn{max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tabbar .tab .pub{border:0;background:#2e7d5b;color:#fff;cursor:pointer;font-size:11px;padding:2px 7px;border-radius:4px;line-height:1.35;font-weight:700}
+.tabbar .tab .pub:hover{background:#216b4d}
+.tabbar .tab .pub:disabled{background:#b7c2cf;cursor:not-allowed}
+.tabbar .tab .x{border:0;background:none;cursor:pointer;color:#95a3b5;font-size:11px;padding:0 2px}
+.tabbar .tab .x:hover{color:#c0392b}
+.tabbar .add{border:1px dashed #9fb6d4;background:#fff;border-radius:6px;padding:4px 9px;cursor:pointer;font-size:12px;color:#2c5a95}
+.tabbar .add:hover{background:#e8f1ff}
+.tabbar .sp{flex:1}
+.tabbar .hint{font-size:11px}
+.tabbox{display:block}
 .seriesline .hint{flex-basis:100%}
 .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:6px 0 2px}
 #msg{font-size:13px}
@@ -91,6 +139,42 @@ input:focus,select:focus{outline:none;border-color:var(--acc)}
 #banner{display:none;padding:8px 18px;font-size:13px;background:#fff4e5;color:#8a5a00;border-bottom:1px solid #f0d9b5}
 #banner.err{background:#fdecea;color:#8a1c14;border-color:#f3c2bd}
 #banner code{background:#fff;padding:1px 6px;border-radius:4px;border:1px solid #e6d3ad;user-select:all}
+/* 使用说明书弹窗 */
+#helpModal .modal-box{max-width:840px}
+.help-tabs{display:flex;flex-wrap:wrap;gap:6px;padding:12px 16px 2px}
+.help-tabs .ht{border:1px solid var(--line);background:#fff;color:var(--sub);border-radius:999px;padding:3px 12px;font-size:12px}
+.help-tabs .ht.on{background:#e8f1ff;border-color:#6b9bd8;color:#12396b;font-weight:700}
+.help-sec{display:none}
+.help-sec.on{display:block}
+.help-p{font-size:13px;line-height:1.85;color:var(--txt)}
+.help-p h4{margin:16px 0 4px;font-size:13px;color:var(--acc)}
+.help-p h4:first-child{margin-top:0}
+.help-p p{margin:8px 0}
+.help-p ul{margin:6px 0;padding-left:20px}
+.help-p li{margin:3px 0}
+.help-p code{font:12px/1.4 Consolas,monospace;background:#eef3f8;border:1px solid var(--line);border-radius:4px;padding:1px 5px;user-select:all}
+.help-p .k{font-weight:700}
+.help-p hr{border:0;border-top:1px dashed var(--line);margin:14px 0}
+.help-tip{font-size:12px;line-height:1.8;border-left:3px solid #cfe0f5;background:#f6f9fd;color:var(--sub);padding:8px 10px;border-radius:0 6px 6px 0;margin:10px 0}
+.help-tip.w{border-left-color:#f0d9b5;background:#fffaf1}
+.help-tip.r{border-left-color:#f3c2bd;background:#fdf3f2}
+.help-tip b{color:#12396b}
+.help-tip.w b{color:#8a5a00}
+.help-tip.r b{color:#b23c3c}
+.help-p table{border-collapse:collapse;width:100%;margin:8px 0;font-size:12px}
+.help-p th,.help-p td{border:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top}
+.help-p th{background:#f7f9fc;font-weight:700}
+.help-sec .num{display:inline-block;min-width:19px;text-align:center;background:#1565c0;color:#fff;border-radius:4px;font-weight:700;font-size:12px;padding:0 6px}
+/* 正式报（確定報）：一键报种徽标 */
+.officialTag{display:none;margin-left:8px;background:#e8f0fe;color:#1565c0;border:1px solid #b6d0f5;border-radius:4px;padding:1px 7px;font-size:12px;font-weight:700;vertical-align:middle}
+.officialTag.on{display:inline-block}
+.card.official{border-color:#90caf9}
+/* 工具栏：P/S 波显示模式（正式报模式开关） */
+.psbar{display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border:1px solid var(--line);border-radius:6px;background:var(--card,#fff)}
+.psbar select{font-size:12px;padding:2px 4px}
+.psbar .psState{font-size:12px;color:var(--sub,#666)}
+.psbar.full{border-color:#ef9a9a;background:#fff5f5}
+.psbar .mini{padding:2px 7px}
 </style>
 </head>
 <body>
@@ -104,30 +188,11 @@ input:focus,select:focus{outline:none;border-color:var(--acc)}
   <span class="sub">服务器</span><span id="dot"></span><span id="dotTxt" class="sub">检测中…</span>
   <span id="cli" class="sub"></span>
   <button class="mini" onclick="reconnect()">重新连接</button>
+  <button class="mini" id="btn-help" onclick="openHelp()" title="打开使用说明书 / 用法说明">📖 说明书</button>
 </header>
 <div id="banner"></div>
 <main>
-  <div class="mapWrap">
-    <div id="map"></div>
-    <select id="baseSel" title="底图切换">
-      <option value="amap">高德 · 矢量</option>
-      <option value="amapsat">高德 · 卫星</option>
-      <option value="osm">OpenStreetMap（境外备用）</option>
-    </select>
-    <div class="legend">地图经纬度（GCJ-02）↔ 报文字段（WGS-84）已自动互转</div>
-  </div>
-  <div id="mapFallback">地图组件加载失败（可能离线）。<br>仍可直接在下方报文卡里手动输入经纬度，或用城市快捷按钮。</div>
-  <div class="cities">
-    <span class="hint">地图点击/拖标记选点（自动换算为 WGS-84 写入报文）/ 快捷城市：</span>
-    <button class="mini" onclick="goCity(35.68,139.76)">东京</button>
-    <button class="mini" onclick="goCity(24.45,122.9)">台湾以东海域</button>
-    <button class="mini" onclick="goCity(39.90,116.40)">北京</button>
-    <button class="mini" onclick="goCity(31.23,121.47)">上海</button>
-    <button class="mini" onclick="goCity(30.57,104.07)">成都</button>
-    <button class="mini" onclick="goCity(38.30,142.40)">三陆冲</button>
-    <button class="mini" onclick="goCity(31.00,142.20)">日本以南海域</button>
-  </div>
-  <div class="hint" style="margin-bottom:4px">提示：把 <b id="subUrl2">…</b> 填进 EQuake 的数据源地址即可；点「发布到服务器」后 EQuake 下一秒就会收到。</div>
+  <div class="hint" style="margin-bottom:4px">提示：把 <b id="subUrl2">…</b> 填进 EQuake 的数据源地址即可；点「发布到服务器」后 EQuake 下一秒就会收到；震中在每张报文卡里点「📍 地图选点」单独设置。</div>
 
   <div class="sentbox">
     <div class="sh">
@@ -135,6 +200,7 @@ input:focus,select:focus{outline:none;border-color:var(--acc)}
       <span id="sentCount" class="hint"></span>
       <span class="hint">（服务器重启/页面刷新后这里会清空）— 可继续给同一事件<b>加报下一报</b>，或<b>直接取消本次地震</b></span>
       <span style="flex:1"></span>
+      <label class="chk" style="color:var(--txt)" title="勾上=只列当前分页（地震）的报文，取消=看全部"><input type="checkbox" id="sentOnlyTab" onchange="renderSent()"> 只看当前分页</label>
       <button class="mini" onclick="refreshSent()">↻ 刷新</button>
     </div>
     <div id="sentList"></div>
@@ -143,38 +209,99 @@ input:focus,select:focus{outline:none;border-color:var(--acc)}
   <div class="toolbar">
     <button class="primary" onclick="publish()">📤 发布到服务器</button>
     <label class="chk" style="color:var(--txt)"><input type="checkbox" id="useDelay" checked> ⏱ 按延迟逐条投递</label>
+    <span class="hint">时刻时区</span><select id="tzSel" title="报文里的时刻按哪个时区解读（影响「现在」、每秒走时、以及服务器解析）。EQuake 按日本时间(UTC+9)解读，默认 UTC+9；选 UTC+8 会让 EQuake 认为地震早了 1 小时而整条不显示" onchange="setTZ(this.value)"><option value="9">UTC+9</option><option value="8">UTC+8</option></select>
+    <span class="hint" id="eqLink" title="EQuake 客户端取数自检：绿色=它正在取数，红色=它没在取（检查 EQuake 是否开着、设置里的 EEW 本地源地址是不是本服务器地址）">EQuake 取数：<b id="eqLinkTxt">--</b></span>
+    <span class="hint" style="font-family:Consolas,monospace" title="你电脑当前的系统时刻（按上面选的时区显示）。拿它跟卡片里的时刻对一下就知道差多少">本机现在 <b id="clkNow">--:--:--</b></span>
+    <button class="mini" onclick="alignAllNow()" title="把当前分页所有卡片的发布时刻与发震时刻一次性设成本机现在（并重新锚定走时）">⏱ 全部对齐本机</button>
+
     <button onclick="addCard()">＋ 添加一报</button>
     <button onclick="loadSample()">载入示例报文</button>
     <button onclick="copyJson()">复制 JSON</button>
     <button onclick="toggleLog()">服务器日志</button>
     <button class="danger" onclick="clearSrv()">清空当前发布</button>
+    <button onclick="openWs()" title="查看本地存档里有哪些地震分页，载入/改名/复制/删除，还能导入导出工作区 JSON">📂 工作区</button>
+    <button onclick="saveWorkspace()" title="把当前所有地震分页（卡片、eventID、信息源、多报参数）存进浏览器 localStorage">💾 保存工作区</button>
+    <button class="danger" onclick="clearWorkspace()" title="删掉本地存档，下次打开回到空白的「地震 1」">🧹 清除存档</button>
+    <span class="hint" id="saveHint"></span>
+    <span class="psbar" id="psBar" title="EQuake 的 P/S 波前是「推算震源」画出来的，由软件设置控制。这里直接改 EQuake 的 Settings.ini（自动备份 .bak），改完需要重启 EQuake。">
+      <span class="hint">📋 正式报 / P/S 波</span>
+      <select id="psMode" onchange="setPsMode(this.value)" title="显示 / 只隐藏推算震源波前 / 完全不画波前（正式报模式）">
+        <option value="show">显示波前（默认）</option>
+        <option value="wave">只隐藏推算震源 P/S 波</option>
+        <option value="full">完全不画波前（正式报）</option>
+      </select>
+      <span class="psState" id="psState">读取中…</span>
+      <button class="mini" onclick="refreshPsMode()" title="重新读取 EQuake 当前设置">↻</button>
+    </span>
     <span id="msg"></span>
   </div>
   <div id="planInfo" class="hint"></div>
 
+  <div class="seriesline" id="quakePresets">
+    <b>🎯 历史地震预设</b>
+    <select id="qpSel"></select>
+    震度来源 <select id="qpIMode" title="预设地震的震度怎么给出">
+      <option value="calc" selected>本项目直接给（历史实况值）</option>
+      <option value="calc_local">本项目算法算（按震级+深度重算）</option>
+      <option value="blank">交给 EQuake 计算（置空+isCSIS）</option>
+      <option value="none">直接填「不明」</option>
+    </select>
+    <label class="chk" style="color:var(--txt)"><input type="checkbox" id="qpRest" checked> 波从震中重新发出</label>
+    <label class="chk" style="color:var(--txt)" title="默认不勾：发震时刻填「现在」，EQuake 里地震波会从震中开始向外扩，看得见过程。勾上则沿用这条地震的真实历史时刻（例如 1975 年），那时地震波早就跑完了，EQuake 屏幕上会是一片空白"><input type="checkbox" id="qpHisTime"> 🕓 用历史发震时刻</label>
+    <button class="mini" onclick="openQPEditor()" title="编辑上面选中的预设（内置历史地震、以及你自己存的预设都能改）；没选中任何一条就是新建">✏️ 编辑所选预设</button>
+    <button class="mini" onclick="applyQuakePreset('single')">📥 直接填入单卡</button>
+    <button class="mini" onclick="applyQuakePreset('series')">🎲 按此生成多报</button>
+    <span class="hint">「直接填入」= 把这条地震的震中/震级/深度/震度/历史发震时刻填进现有那张卡；「生成多报」= 把它当作<b>末报的最终值</b>跑一遍由弱到强的序列；历史发震时刻已过去很久，默认勾「波从震中重新发出」，要真实复现「波已传遍全球」就把它取消并填「震波已发出(秒)」。</span>
+  </div>
+
   <div class="seriesline" id="mainSeries">
     <b>🎲 生成多报序列</b>
+    <span class="hint" id="msCur"></span>
     共 <input type="number" id="msN" value="6" min="2" max="99"> 报
     <select id="msNMode"><option value="exact">精确</option><option value="approx" selected>大约</option></select>
     每报间隔 <input type="number" id="msG" value="4" min="0" max="600"> 秒
     <select id="msGMode"><option value="exact">精确</option><option value="approx" selected>大约</option></select>
+    震度来源 <select id="msIMode" title="整条序列的震度/长周期等级怎么来">
+      <option value="calc" selected>本项目算法算</option>
+      <option value="auto">由最终值往回递减（旧行为）</option>
+      <option value="blank">交给 EQuake 计算（置空+isCSIS）</option>
+      <option value="none">直接填「不明」</option>
+    </select>
+    波程 <select id="msWave" title="整条序列每一报的地震波起点怎么变（EQuake 里波前会从哪出发）">
+      <option value="stable" selected>保持稳定（首报锚定·后续继波）</option>
+      <option value="reeach">每报从震中重发</option>
+      <option value="jump">随机跳动（变来变去）</option>
+    </select>
+    <div class="ms-frow">
+      <b>eventID</b> <input type="text" id="msEid" placeholder="留空=沿用最终报">
+      <button class="mini" onclick="syncMsID()" title="同步：把卡片区第一张（最终报）的 eventID 填进这里">↺ 同步</button>
+      <button class="mini" onclick="newEid()" title="刷新：随机换一个新 eventID，并同步到当前分页（同一 eventID 才认作同一次地震的续报）">🎲 换一个</button>
+    </div>
+    <div class="ms-frow">
+      <b>信息源 sourceName</b> <input type="text" id="msSrc" list="srcList" placeholder="留空=沿用最终报">
+    </div>
     <button class="mini" onclick="genSeriesMain()">生成到卡片区</button>
     <span class="hint">先在<b>上方卡片区填好最终报</b>（震级/震中/深度/震度/类型设成最终想要的，并勾好「波从震中重新发出」），点这里自动生成一串<b>由弱到强、数值来回飘</b>的报，<b>末报=你填的最终报</b>；
-    「大约」会在你填的数附近随机浮动（报数、间隔都飘忽），「精确」则严格按你填的执行；生成后可逐张微调再发布。</span>
+    「大约」会在你填的数附近随机浮动（报数、间隔都飘忽），「精确」则严格按你填的执行；生成后可逐张微调再发布。<br>
+    <b>eventID / 信息源</b>：两框<b>留空</b> = 沿用上面最终报那张卡里的值；填了就<b>整条序列统一用你填的</b>（同一 eventID 才能串成一次地震的续报，信息源建议用 JMA／CENC／USGS／CEIC／FJ／TW／KMA／PTWC）。<br>
+    <b>发震时刻同步</b>：勾选（默认）= 每报的 shockTime 就是它自己的 reportTime，波都从震中刚出发；取消 = 整条序列沿用末报那个发震时刻，发布时刻逐报递增，波继着上一次继续扩（跟工具栏的「🔗 始终同步」是一个意思，这里可单独按分页记）。</span>
   </div>
 
   <div id="logPanel"></div>
 
+  <div class="tabbar" id="eqTabs"></div>
+  <div id="tabPages"></div>
   <div id="cards"></div>
   <div id="preview"></div>
   <div class="hint">
     规则说明（来自 EQuake）：
-    ① maxIntensity / maxLgInt 三个档位：「具体值」（直接告诉 EQuake）、「不明」（EQuake 显示「不明」）、「EQuake 计算」（字段留空，由 EQuake 根据震级与震中距自行推算震度，不依赖 isCSIS，**默认就是这一档**）；勾选 isCSIS 也会把两字段输出为空；
+    ① maxIntensity / maxLgInt 三个档位：「具体值」（直接告诉 EQuake）、「不明」（填字面值「不明」；isCSIS=false 且震级≤1.0 时 EQuake 会判为 IPF 单点）、「EQuake 计算」（**默认这一档**＝两字段置空**并自动勾选 isCSIS=true**，此时 isCSIS 勾选框会锁上——EQuake 官方说明：只有 isCSIS=true 且两字段置空才会自行推算烈度，只置空不勾 isCSIS 会显示成「不明」）；**例外**：勾了「isFinal（最终报告）」时，isCSIS 不再被强制锁上，可只勾 isFinal、不勾 isCSIS（即便震度置空也允许；此时该最终报告 EQuake 可能按「不明」处理，确需系统推算请再勾 isCSIS）；
     ② isCSIS 不勾、震度为「不明」且震级 ≤ 1.0 时，EQuake 自动判为 IPF 单点；
     ③ 时间按 UTC+9 填写；若需 JMA 24+ 时制（如凌晨 0 点写成 24/25 时），请手动修改时间文本；地震波控制（同一 eventID 的续报/加报默认「继着上一次波」、不重置）：勾「波从震中重新发出」= 送达时把发震时刻改写成送达时刻，波从震中刚出发；或填「震波已发出(秒)」= 送达时按此头程重发（波已向外扩约 秒×7km，不继着上一次）；两者都留空 = 沿用该事件已建立的震源时刻，波接着上一报继续向外扩（速报/PLUM 默认勾选重新发出；最终报告/取消报默认不勾，继着上波）；
-    ④ 底图为高德瓦片（GCJ-02 加密坐标），页面已自动与报文使用的 WGS-84 互转；高德对日本等境外海域无覆盖，可在地图右上角切到「OpenStreetMap 备用」；
+    ④ 震中在每张报文卡里点「📍 地图选点」单独设置（弹窗地图，可能按不了就手动输经纬度）；底图为高德瓦片（GCJ-02 加密坐标），已自动与报文使用的 WGS-84 互转；高德对日本等境外海域无覆盖，可在选点弹窗右上角切到「OpenStreetMap 备用」；
     ⑤ 「距上一报延迟」= 该报相对前一报晚多少秒送到 EQuake（EQuake 每秒轮询一次，实际精度约 1 秒）；第 1 报延迟填 0 即立即发出；典型用法：速报 → N 秒后最终报告 → 再 N 秒后取消报，共用一个 eventID；
-    ⑥ EQuake 的「P 波 / S 波」是**推算震源**的波前，与报文类型无关，受软件设置「隐藏推算震源P/S波」（配置键 IsHidePSWaveOfEstimatedEpicenter）控制，默认会显示。
+    ⑥ EQuake 的「P 波 / S 波」是**推算震源**的波前，与报文类型无关，受软件设置「隐藏推算震源P/S波」（配置键 IsHidePSWaveOfEstimatedEpicenter）控制，默认会显示；想发<b>没有 P/S 波的正式报</b>：卡片点「📋 正式报」＋工具栏「📋 正式报 / P/S 波」选「完全不画波前」并重启 EQuake（详见说明书第 8 段）；
+    ⑦ 同一批报必须<b>共用一个 eventID、且报数递增</b>：「＋ 添加一报」会自动沿用上一张的 eventID 并把报数 +1（换编号用「换一个」，它会把同编号的报一起换，保证不拆批）；报数相同或比已发过的报数小，EQuake 会当成同一条/旧报直接忽略 —— 这就是「后面的报发不出来」的常见原因。
   </div>
   <div class="hint" style="margin-top:6px">
     🔍 排查「EQuake 一直显示罗蒙诺索夫海岭 / 不画震中X」：这通常是 EQuake 没有拿到有效数据（它显示了内置演示位置）。步骤：
@@ -197,6 +324,128 @@ input:focus,select:focus{outline:none;border-color:var(--acc)}
   </div>
 </div>
 
+<div class="modal-wrap" id="pickModal">
+  <div class="modal-box">
+    <div class="modal-hd"><b id="pickTitle">📍 地图选点</b><span style="flex:1"></span><button onclick="closePick()">✕</button></div>
+    <div class="modal-bd">
+      <div class="maphead">
+        <span class="hint">点地图选震中（自动换算为 WGS-84 写回这张卡）</span>
+        <span style="flex:1"></span>
+        <select id="pickBaseSel"><option value="amap">高德矢量</option><option value="amapsat">高德卫星</option><option value="osm">OpenStreetMap</option></select>
+      </div>
+      <div class="place-search">
+        <input type="text" id="pickSearch" placeholder="🔍 搜索地点（如：东京 / osaka / 福島 / 北京）" oninput="placeSearch(this.value,'pick')" onkeydown="if(event.key==='Escape'){this.value='';placeSearch('','pick')}">
+        <div class="place-results" id="pickResults"></div>
+      </div>
+      <div class="mapWrap">
+        <div id="pickMap"></div>
+        <div id="pickFallback">地图组件加载失败（可能离线）。<br>可直接在该报文卡里手动输入经纬度，或用下面的快捷城市。</div>
+      </div>
+      <div class="cities" id="pickCities">
+        <span class="hint">快捷：</span>
+        <button class="mini" onclick="pickCity(35.68,139.76)">东京</button>
+        <button class="mini" onclick="pickCity(24.45,122.9)">台湾以东海域</button>
+        <button class="mini" onclick="pickCity(39.90,116.40)">北京</button>
+        <button class="mini" onclick="pickCity(31.23,121.47)">上海</button>
+        <button class="mini" onclick="pickCity(30.57,104.07)">成都</button>
+        <button class="mini" onclick="pickCity(38.30,142.40)">三陆冲</button>
+        <button class="mini" onclick="pickCity(31.00,142.20)">日本以南海域</button>
+      </div>
+      <div class="hint" id="pickInfo">当前震中：—</div>
+    </div>
+    <div class="modal-ft">
+      <button class="mini" onclick="syncPrev()">⇄ 用上一报坐标</button>
+      <span style="flex:1"></span>
+      <button class="primary" onclick="closePick()">完成（已写入）</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-wrap" id="qpModal">
+  <div class="modal-box">
+    <div class="modal-hd"><b>🗂 自定义地震预设</b><span style="flex:1"></span><button onclick="closeQPEditor()">✕</button></div>
+    <div class="modal-bd">
+      <p class="modal-note">这里增删的预设保存在浏览器 <code>localStorage</code>（键 <code>eqsender.qp.custom</code>），刷新/重开页面都还在，点「📥 直接填入单卡」「🎲 按此生成多报」就会按这里的数值走。内置的那 10 条历史地震不可改。</p>
+      <div class="grid">
+        <label style="grid-column:1/-1">名称（显示在预设下拉里，建议带震级/震度）<input type="text" id="qpeName" placeholder="如：我的测试震 M5.0（浅源・震度5-）"></label>
+        <label>eventID<input type="text" id="qpeId" placeholder="如：EQ_202601010800 或 201103111446"></label>
+        <label>placeName 位置名<input type="text" id="qpePlace" placeholder="如：青森県東方沖"></label>
+        <label>latitude 纬度<input type="number" step="0.1" id="qpeLat" value="35.68"></label>
+        <label>longitude 经度<input type="number" step="0.1" id="qpeLng" value="139.76"></label>
+        <label>depth 深度(km)<input type="number" step="1" id="qpeDep" value="10"></label>
+      </div>
+      <div class="qpe-map">
+        <div class="maphead">
+          <span class="hint">点下面的地图选震中（自动换算为 WGS-84 写回上面的纬度/经度）</span>
+          <span style="flex:1"></span>
+          <select id="qpeBaseSel"><option value="amap">高德矢量</option><option value="amapsat">高德卫星</option><option value="osm">OpenStreetMap</option></select>
+        </div>
+        <div class="place-search">
+          <input type="text" id="qpeSearch" placeholder="🔍 搜索地点（如：东京 / osaka / 福島 / 北京）" oninput="placeSearch(this.value,'qpe')" onkeydown="if(event.key==='Escape'){this.value='';placeSearch('','qpe')}">
+          <div class="place-results" id="qpeResults"></div>
+        </div>
+        <div class="mapWrap">
+          <div id="qpeMap"></div>
+          <div id="qpeFallback">地图组件加载失败（可能离线）。<br>直接在上面手动输入经纬度即可，或点下面的快捷城市。</div>
+        </div>
+        <div class="cities">
+          <span class="hint">快捷：</span>
+          <button class="mini" onclick="qpeCity(35.68,139.76)">东京</button>
+          <button class="mini" onclick="qpeCity(24.45,122.9)">台湾以东海域</button>
+          <button class="mini" onclick="qpeCity(39.90,116.40)">北京</button>
+          <button class="mini" onclick="qpeCity(31.23,121.47)">上海</button>
+          <button class="mini" onclick="qpeCity(30.57,104.07)">成都</button>
+          <button class="mini" onclick="qpeCity(38.30,142.40)">三陆冲</button>
+          <button class="mini" onclick="qpeCity(31.00,142.20)">日本以南海域</button>
+          <button class="mini" onclick="qpeFromCards()">⇄ 用页面上最新的报</button>
+        </div>
+        <div class="hint" id="qpeMapInfo">当前震中：—</div>
+      </div>
+      <div class="grid" style="margin-top:10px">
+        <label>magnitude 震级<input type="number" step="0.1" id="qpeMag" value="5.0"></label>
+        <label>maxIntensity 最大震度<select id="qpeImi"></select></label>
+        <label>maxLgInt 长周期地震动等级<select id="qpeLgi"></select></label>
+        <label style="grid-column:1/-1">shockTime 发震时刻<input type="text" id="qpeShock" placeholder="如：2026/01/01 10:00:00"></label>
+      </div>
+      <div class="hint" id="qpeKeyHint" style="margin-top:8px"></div>
+      <div class="hint" id="qpeDirty" style="margin-top:4px"></div>
+    </div>
+    <div class="modal-ft">
+      <button class="mini" onclick="openQPEditor('')">＋ 新建一条</button>
+      <button class="mini" onclick="saveQPEdited()">💾 保存预设</button>
+      <button class="mini danger" onclick="delQPEdited()">🗑 删除当前</button>
+      <span style="flex:1"></span>
+      <button class="primary" onclick="closeQPEditor()">关闭</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-wrap" id="wsModal">
+  <div class="modal-box">
+    <div class="modal-hd"><b>📂 工作区（本地存档）</b><span style="flex:1"></span><button onclick="closeWs()">✕</button></div>
+    <div class="modal-bd">
+      <p class="modal-note">你之前存过的<b>每一场地震分页</b>都在这儿（卡片、eventID、信息源、多报参数都在里面）。可以<b>载回当前页继续编辑</b>、改名、复制成一页新的、从存档删掉，也能把整份工作区复制走 / 粘回来。</p>
+      <div id="wsList"></div>
+      <div style="margin-top:12px;border-top:1px dashed var(--line);padding-top:10px">
+        <label style="margin-bottom:6px">导入工作区 JSON（把「📤 复制全部 JSON」拷来的内容粘进来，覆盖本地存档）</label>
+        <textarea id="wsImport" rows="3" placeholder='{"v":2,"at":"...","cur":0,"tabs":[{...}]}'></textarea>
+        <div style="margin-top:6px">
+          <button class="mini" onclick="importWs()">📥 导入并覆盖存档</button>
+          <button class="mini" onclick="document.getElementById('wsImport').value=''">🧹 清空输入框</button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="mini" onclick="saveWorkspace()">💾 把当前这些也存进存档</button>
+      <button class="mini" onclick="renderWsList()">🔄 刷新列表</button>
+      <button class="mini" onclick="exportWs()">📤 复制全部 JSON</button>
+      <button class="mini danger" onclick="clearWorkspace()">🧹 清除存档</button>
+      <span style="flex:1"></span>
+      <button class="primary" onclick="closeWs()">关闭</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-wrap on" id="discModal">
   <div class="modal-box" style="max-width:560px;margin-top:8vh">
     <div class="modal-hd"><b>⚠️ 免责声明</b></div>
@@ -208,6 +457,255 @@ input:focus,select:focus{outline:none;border-color:var(--acc)}
     <div class="modal-ft">
       <span style="flex:1"></span>
       <button class="primary" onclick="closeDisc()">我已了解并同意，继续使用</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-wrap" id="helpModal" onclick="helpBackdrop(event)">
+  <div class="modal-box">
+    <div class="modal-hd">
+      <b>📖 EQuake 发报台 · 使用说明书</b>
+      <span class="hint">按 <b>Esc</b> 或点空白处关闭</span>
+      <span style="flex:1"></span>
+      <button class="mini" onclick="helpStep(-1)">← 上一段</button>
+      <button class="mini" onclick="helpStep(1)">下一段 →</button>
+      <button class="mini" onclick="closeHelp()">✕ 关闭</button>
+    </div>
+    <div class="help-tabs" id="helpTabs"></div>
+    <div class="modal-bd">
+      <div class="help-p">
+
+      <!-- 0 快速上手 -->
+      <div class="help-sec on" data-sec="0">
+        <h4><span class="num">1</span> 启动服务器</h4>
+        <p>双击 <b>startserver.bat</b>（或 <b>启动服务器.bat</b>），会开一个小窗口并在本机起一个零依赖的 Node 服务，默认端口 <code>8790</code>；端口被占用就自动顺延到下一个。浏览器打开页顶显示的那个地址（一般是 <code>http://127.0.0.1:8790/</code>）。</p>
+        <p>顶栏「服务器」前面的小圆点 <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#2e7d32;vertical-align:-1px"></span> <b class="k">变绿</b> = 页面连上服务器了；灰点就是还没连上（此时点「📤 发布到服务器」会提示，也可以点「设置服务器」手动填地址）。</p>
+
+        <h4><span class="num">2</span> 把订阅地址填给 EQuake</h4>
+        <p>页顶那一长串「EQuake 订阅地址（每秒轮询）」（点一下可以复制）就是给 EQuake 填的本地源地址，通常形如 <code>http://127.0.0.1:8790/json</code>。在 EQuake 的数据源设置里<b>原样粘贴</b>（http 开头、末尾不要空格、不要 https、不要多带路径）。</p>
+        <div class="help-tip r"><b>注意：</b>EQuake 每秒只来拉一次数据，所以「发布」最迟 1~2 秒后才能在 EQuake 里看到。发布后看顶栏「EQuake 取数」，显示 <b>✓ 正在取数</b> 就说明链路是通的。</div>
+
+        <h4><span class="num">3</span> 填一张报文卡并发出去</h4>
+        <ul>
+          <li>在卡片区把 <b>震级 / 震中经纬度 / 深度 / 最大震度</b> 填好，点 <b>📍 地图选点</b> 可以在地图上点震中（自动换算成 WGS-84 写回卡片）。</li>
+          <li>顶栏<b>时刻时区保持默认 UTC+9</b> —— EQuake 按日本时间解读报文时刻，选 UTC+8 会被当成地震早了 1 小时而整条丢弃。</li>
+          <li>点 <b class="k">📤 发布到服务器</b> → 等 1~2 秒 → 看 EQuake。</li>
+        </ul>
+
+        <h4><span class="num">4</span> 想发多报（速报 → 最终报告 → 取消报）</h4>
+        <p>点 <b>＋ 添加一报</b>，新卡会<b class="k">自动沿用上一张的 eventID 并把报数 +1</b>；每卡填「距上一报延迟（秒）」，勾上工具栏「⏱ 按延迟逐条投递」，再一次性发布，就会按间隔逐条送出去。<br>
+        想更省事：先在卡片区填好<b>最终报</b>那张卡，再点「🎲 生成多报序列 → 生成到卡片区」，会自动串出一条由弱到强的序列。</p>
+        <div class="help-tip"><b>最小可用套路：</b>「载入示例报文」→「📤 发布到服务器」→ 看 EQuake 出图，之后照着改数就行。</div>
+      </div>
+
+      <!-- 1 顶栏与工具栏 -->
+      <div class="help-sec" data-sec="1">
+        <h4>顶栏（页面最上面一条）</h4>
+        <table>
+          <tr><th>元素</th><th>作用</th></tr>
+          <tr><td>EQuake 订阅地址</td><td>给 EQuake 填的数据源地址，点一下复制 / 点「复制」按钮</td></tr>
+          <tr><td>设置服务器</td><td>手动指定发报服务器地址（含 http:// 与端口），一般不用动</td></tr>
+          <tr><td>服务器小圆点 + 状态文字</td><td>绿点 = 已连上；后面跟的是最近一次探测信息</td></tr>
+          <tr><td>EQuake 取数</td><td>自检：✓ 正在取数 / ⚠ 已 N 秒没取数 / ✗ 没在取数（见第 6 节）</td></tr>
+          <tr><td>重新连接</td><td>重新探测服务器（服务器重启或换端口后点它）</td></tr>
+          <tr><td>📖 说明书</td><td>就是你现在看的这本，点一下按章跳过去</td></tr>
+        </table>
+
+        <h4>工具栏（页面第二排）</h4>
+        <table>
+          <tr><th>按钮</th><th>作用</th></tr>
+          <tr><td>📤 发布到服务器</td><td>把<b>当前分页</b>里<b>「启用」勾上</b>的卡片，按各自的延迟逐条投递给服务器</td></tr>
+          <tr><td>⏱ 按延迟逐条投递</td><td>勾上=按每卡的「距上一报延迟」错开送；取消=同一批一口气立刻发出</td></tr>
+          <tr><td>时刻时区</td><td>报文时刻按哪个时区解读（默认 UTC+9，<b>必须和服务器一致</b>）</td></tr>
+          <tr><td>⏱ 全部对齐本机</td><td>把当前分页所有卡片的发布时刻、发震时刻一次性设成本机现在</td></tr>
+          <tr><td>📋 正式报 / P/S 波</td><td>切换 EQuake 的波前显示（显示 / 只隐藏推算震源波 / 完全不画波前）。发<b>正式报</b>时选「完全不画波前」，改完要重启 EQuake。详见第 8 段</td></tr>
+          <tr><td>＋ 添加一报</td><td>加一张卡：沿用上一张的 eventID、报数 +1</td></tr>
+          <tr><td>载入示例报文</td><td>塞一条与 EQuake 官方示例一致的报文，用来做对照测试</td></tr>
+          <tr><td>复制 JSON</td><td>把当前分页的报文原样复制到剪贴板（方便存档/对照）</td></tr>
+          <tr><td>服务器日志</td><td>黑面板里显示服务器收到的请求，能看出 EQuake 到底有没有来拉</td></tr>
+          <tr><td>清空当前发布</td><td>清掉服务器上的当前待发内容（另一个方向的「清空」）</td></tr>
+          <tr><td>📂 工作区</td><td>本地存档管理：载入 / 改名 / 复制 / 删除 / 导入导出整份 JSON</td></tr>
+          <tr><td>💾 保存工作区</td><td>手动把当前所有分页存进浏览器 localStorage（一般会自动存，手动存更保险）</td></tr>
+          <tr><td>🧹 清除存档</td><td>删掉本地存档，下次打开回到空白的「地震 1」</td></tr>
+        </table>
+      </div>
+
+      <!-- 2 报文卡 -->
+      <div class="help-sec" data-sec="2">
+        <h4>一张报文卡里有什么</h4>
+        <table>
+          <tr><th>字段</th><th>怎么填</th></tr>
+          <tr><td>eventID 事件ID</td><td>同一批报<b class="k">必须一模一样</b>，EQuake 才认作「同一次地震」。「＋添加一报」会自动沿用；卡里的「换一个」会把<b>同编号的所有报一起换</b>（不想拆批就别单独改）</td></tr>
+          <tr><td>reportNum 第几报</td><td><b class="k">必须递增</b>。报数相同、或比已经发过的报数小，后面的报会被 EQuake 直接忽略 —— 这是「后面的报发不出来」最常见的原因</td></tr>
+          <tr><td>reportTime / shockTime</td><td>发布时刻 / 发震时刻，<b>各自独立填写</b>，互不相干、也不会自动每秒跳。都填 UTC+9 时间文本，点「现在」取本机当前（按上面选的时区）</td></tr>
+          <tr><td>waveStart 震波已发出(秒)</td><td>发震时刻比发布时刻早多少 = 波已经往外跑了一段</td></tr>
+          <tr><td>maxIntensity / maxLgInt</td><td>最大震度 / 长周期地震动等级，三档见第 6 节</td></tr>
+          <tr><td>maxIntensity 旁的「不明」</td><td>只在等 EQuake 自己算时选（见 6 节）</td></tr>
+          <tr><td>距上一报延迟（秒）</td><td>这一报相对<b>上一张卡</b>晚几秒送到 EQuake；第一张填 0 = 立即发出。EQuake 每秒轮询一次，实际精度约 1 秒</td></tr>
+        </table>
+
+        <h4>卡片头部的按钮</h4>
+        <ul>
+          <li><b>第 N 报 + 启用</b>：只发<b>勾上「启用」</b>的卡，想留着不发的临时取消勾选即可。</li>
+          <li><b>EEW 速报 / PLUM / 最终报告 / 📋 正式报 / 取消报</b>：一键把 isCSIS / isPLUM / isFinal / isCancel 勾上（对应 EQuake 里的报种）。其中「<b>📋 正式报</b>」还会按震级+深度算出确定震度、不重发波，卡片头出现蓝色徽标；配合工具栏「完全不画波前」就是没有 P/S 波的正式报（详见第 8 段）。</li>
+          <li><b>📐 算震度</b>：按这张卡的<b>震级 + 深度</b>用本项目算法直接算出最大震度与长周期地震动等级填进去——<b>深度越浅震度越大、越深越小</b>（同震级下深源会被明显压低）。</li>
+          <li><b>📍 地图选点</b>：弹窗里点地图选震中，自动 GCJ-02↔WGS-84 换算写回经纬度；右上角可切高德卫星 / OpenStreetMap 备用；下面一排是快捷城市。地图加载不出来（离线）就直接手输经纬度。</li>
+          <li><b>删除</b>：删掉这张卡，其余卡的报数会自动理顺。</li>
+        </ul>
+
+        <div class="help-tip"><b>地震波怎么扩：</b>看卡片底部的「波从震中重新发出」——
+        勾上（默认）= 送达时把发震时刻改写成送达时刻，<b>波从震中刚出发</b>，EQuake 里能看见波一圈圈往外扩；
+        取消 + 填「震波已发出(秒)」= 按这个头程重发（波已向外扩出相应距离）；
+        都留空 = <b>继着上一报的波继续扩</b>（速报/PLUM 默认重发，最终报告/取消报默认沿用）。</div>
+      </div>
+
+      <!-- 3 序列与预设 -->
+      <div class="help-sec" data-sec="3">
+        <h4>🎲 生成多报序列（在卡片区上一条虚线框里）</h4>
+        <p>先在<b>卡片区填好最终报</b>（震级/震中/深度/震度设成最终想要的），再点「生成到卡片区」，会自动铺出一串<b>由弱到强、数值来回飘</b>的报，<b class="k">末报 = 你填的最终报</b>。</p>
+        <ul>
+          <li><b>报数 / 间隔</b>：「大约」在你填的数附近随机浮动，「精确」严格照执行。</li>
+          <li><b>震度来源</b>：本项目算法算 / 由最终值往回递减 / 交给 EQuake 计算（置空并自动勾 isCSIS）/ 直接填「不明」。</li>
+          <li><b>波程</b>：整条序列每报的<b>地震波起点</b>怎么变——<b>保持稳定</b>（首报锚定、后续报波继着上一次继续扩）/ <b>每报从震中重发</b>（每报都从原点重扩一遍）/ <b>随机跳动</b>（后续报约四成从震中重发、其余带上随机「震波已发出秒数」，波前忽近忽远，就是 EQuake 里「变来变去」的效果）。想看波来回跳就选它。</li>
+          <li><b>eventID / sourceName</b>：两框留空 = 沿用卡片区最终报那张；填了就整条序列统一用它（同一 eventID 才串得起来；信息源建议 JMA / CENC / USGS / CEIC / FJ / TW / KMA / PTWC）。</li>
+          <li>「↺ 同步」把第一张卡的 eventID 填进来；「🎲 换一个」随机换新编号（同编号的一起换）。</li>
+        </ul>
+
+        <h4>🎯 历史地震预设（再上一条虚线框）</h4>
+        <ul>
+          <li><b>📥 直接填入单卡</b>：把选中的那条预设（震中/震级/深度/震度/发震时刻）填进现有那张卡。</li>
+          <li><b>🎲 按此生成多报</b>：把它当作末报的最终值，跑一遍生成整条序列。</li>
+          <li><b>✏️ 编辑所选预设</b>：打开预设编辑弹窗。里面<b>带一块内联地图</b>，点地图（或快捷城市、或「⇄ 用页面上最新的报」）直接写回上面的纬度/经度；底部状态行会显示<b>这条存没存过 / 有没有没保存的改动</b>，保存时还会列出「旧值 → 新值」改动清单；有改动直接关窗口或按 Esc 会拦一下。内置历史地震只能<b>另存为自定义</b>后改，不会动原件。</li>
+          <li>你自己存的预设保存在浏览器 localStorage（键 <code>eqsender.qp.custom</code>），刷新、重开页面都还在；「＋ 新建一条」从空白开始造。</li>
+        </ul>
+        <div class="help-tip w"><b>历史发震时刻：</b>默认勾「波从震中重新发出」，因为 1975 年的地震波早就跑完了，用历史时刻发过去 EQuake 屏幕上会是一片空白。想真实复现「波已传遍全球」，就把这个勾<b>取消</b>并填「震波已发出(秒)」。</div>
+      </div>
+
+      <!-- 4 分页与存档 -->
+      <div class="help-sec" data-sec="4">
+        <h4>分页栏（一次备好几场「地震」）</h4>
+        <p>顶上那排 <code>[地震 1] [地震 2] … [＋]</code> 就是分页：每一页是<b>独立的卡片区、独立的 eventID、独立的多报参数</b>，互不干扰。可以一边备着「日本海沟」一边备「台湾以东海域」。</p>
+        <ul>
+          <li>点标签切页；页上的 <b>发布</b> 按钮<b>只发这一页</b>；页名双击可改名；<b>✕</b> 删掉这一页。</li>
+          <li>所有改动 <b>800 毫秒后自动存进 localStorage</b>（工具栏「💾 保存工作区」是手动强制存一次；「saveHint」会提示存没存）。</li>
+        </ul>
+
+        <h4>📂 工作区（本地存档管理）</h4>
+        <ul>
+          <li>列出你存过的<b>每一场地震分页</b>，可以<b>载回当前页继续编辑</b>、改名、复制成一页新的、从存档删掉。</li>
+          <li><b>📤 复制全部 JSON</b>：把整份工作区复制走（备份 / 换电脑）；<b>📥 导入并覆盖存档</b>：把粘进来的内容覆盖回本地存档。</li>
+          <li><b>🧹 清除存档</b>：删掉本地存档，下次打开回到空白的「地震 1」。</li>
+        </ul>
+        <div class="help-tip w"><b>浏览器清缓存 / 换浏览器会带着存档一起没</b>，重要的整份 → 用「📤 复制全部 JSON」存一份。</div>
+      </div>
+
+      <!-- 5 EQuake 接线 -->
+      <div class="help-sec" data-sec="5">
+        <h4>EQuake 侧怎么接</h4>
+        <ol>
+          <li>EQuake 里把本地数据源地址设成页顶那个订阅地址（<code>http://127.0.0.1:8790/json</code>），<b>http 开头、不要空格、不要 https</b>。</li>
+          <li>EQuake 保持开着，它会<b>每秒</b>来拉一次。</li>
+          <li>回本页点 <b>📤 发布到服务器</b>，等 1~2 秒再看 EQuake 主界面。</li>
+        </ol>
+
+        <h4>三个能一眼看出链路通不通的地方</h4>
+        <ul>
+          <li><b>顶栏「EQuake 取数」</b>：✓ 正在取数（N 秒前）= 通；⚠ 已 N 秒没取数 = EQuake 卡住或地址不对；✗ 没在取数 = <b>EQuake 没开 / 地址没设成本机地址</b>。超过 30 秒没动会标红。</li>
+          <li><b>工具栏「本机现在」</b>：跟卡片里的时刻对一下，差 1 小时就是时区选错了。</li>
+          <li><b>服务器日志</b>（点「服务器日志」展开）：里面有没有 EQuake 的请求记录 = 端口通不通。</li>
+        </ul>
+      </div>
+
+      <!-- 6 规则速查 -->
+      <div class="help-sec" data-sec="6">
+        <h4>规则速查（来自 EQuake 的报文字段规则）</h4>
+        <p><b class="k">① 最大震度 / 长周期地震动，三个档位：</b></p>
+        <table>
+          <tr><th>档位</th><th>怎么填</th></tr>
+          <tr><td>具体值</td><td>直接告诉 EQuake 是多少级</td></tr>
+          <tr><td>不明</td><td>填字面值「不明」；isCSIS=false 且震级 ≤1.0 时 EQuake 会判成 IPF 单点</td></tr>
+          <tr><td>EQuake 计算 <b>（默认这一档）</b></td><td>两个字段<b>置空</b>并自动勾上 <b>isCSIS=true</b> —— EQuake 官方说明：只有 isCSIS=true 且两字段置空才会自行推算烈度；只置空不勾 isCSIS 会显示成「不明」</td></tr>
+        </table>
+        <p><b class="k">② 时间是 UTC+9。</b>JMA 24 小时制那一档（凌晨 0 点写成 24/25 时）需要你手动改时间文本。</p>
+        <p><b class="k">③ 同一批报必须共用一个 eventID 且报数递增。</b>「＋添加一报」已经帮你做好，「换一个」会整批一起换。</p>
+        <p><b class="k">④ 地图选点用的是高德瓦片（GCJ-02 加密坐标）</b>，已自动和报文用的 WGS-84 双向换算；高德对日本境外部分海域没覆盖，弹窗右上角切「OpenStreetMap 备用」。</p>
+        <p><b class="k">⑤ EQuake 里的「P 波 / S 波」是推算震源的波前</b>，跟报文报种无关，由 EQuake 设置项「隐藏推算震源P/S波」控制，默认显示。想发<b>没有波前的正式报</b>，见第 8 段（卡片「📋 正式报」＋工具栏关波前）。</p>
+        <p><b class="k">⑥ 典型发报节奏：</b>速报 → N 秒后最终报告 → 再 N 秒后取消报，三者共用一个 eventID、报数依次 +1。</p>
+      </div>
+
+      <!-- 7 正式报 / P/S 波 -->
+      <div class="help-sec" data-sec="7">
+        <h4>📋 正式报（没有 P/S 波的确定报）</h4>
+        <p>普通 EEW 速报在 EQuake 里会画一圈一圈向外扩的 <b>P 波 / S 波波前</b>；<b>正式报</b>（确定报 / 地震情報）是震后把震源、震级、最大震度都定下来的报，<b>不画波前</b>，只显示确定的结果。这一节说明怎么在本发报台里发出这种报。</p>
+
+        <div class="help-tip w"><b>先说清楚一个技术事实：</b>EQuake 的「自定义预警源」（也就是你在设置里填的 <code>http://127.0.0.1:8790/json</code>）<b>只有 EEW 一条通道</b>，官方给的报文模板里也只有 isCSIS / isPLUM / isFinal / isCancel 这几个报种。EQuake 里那些真正叫「地震情報」的正式报（<code>reportJMA</code> / <code>reportUSGS</code> / <code>reportCENC</code> 等）是软件自己从各机构 API 拉的，<b>不能由自定义源注入</b>。所以这里的做法是<b>等效组合</b>：报种发「最終報」＋把 EQuake 的波前显示关掉，视觉效果与正式报一致。</div>
+
+        <h4>两步走</h4>
+        <ol>
+          <li><b>卡片上点「📋 正式报」</b>（卡片头部那一排报种按钮里）。它一键做成 <b>isFinal=true</b>（最終報）、按<b>震级+深度</b>算出<b>确定震度</b>填进 maxIntensity / maxLgInt（不置空、不勾 isCSIS，否则 EQuake 会按「不明」处理）、<b>不勾「波从震中重新发出」</b>、清空「震波已发出秒数」。卡片头会出现蓝色「📋 正式报」徽标。</li>
+          <li><b>工具栏「📋 正式报 / P/S 波」下拉选「完全不画波前（正式报）」</b>。它会直接改 EQuake 的 <code>Settings.ini</code>（首次自动备份成 <code>Settings.ini.bak</code>，选回「显示波前（默认）」即可恢复）。<b class="k">改完必须完全退出 EQuake 再重新打开才生效</b>；若 EQuake 还开着就改，它退出时可能把设置覆盖回去。</li>
+        </ol>
+        <p>然后正常点「📤 发布到服务器」，EQuake 里就是一张没有 P/S 波前、带确定震度的正式报。</p>
+
+        <h4>三档设置分别是什么</h4>
+        <table>
+          <tr><th>档位</th><th>改动的 EQuake 设置</th><th>效果</th></tr>
+          <tr><td>显示波前（默认）</td><td>隐藏推算震源波=false、检测网格=true、震源推算=true</td><td>EEW 原样，波前正常向外扩</td></tr>
+          <tr><td>只隐藏推算震源 P/S 波</td><td>隐藏推算震源波=true</td><td>不画软件自己推算出来的那套波前，其余保留</td></tr>
+          <tr><td>完全不画波前（正式报）</td><td>隐藏推算震源波=true、检测网格=false、震源推算=false</td><td>任何波前都不画，适合发正式报</td></tr>
+        </table>
+
+        <div class="help-tip"><b>为什么波前跟报种无关？</b>EQuake 的 P/S 波是「<b>推算震源</b>」画出来的（设置项「隐藏推算震源P/S波」，配置键 <code>IsHidePSWaveOfEstimatedEpicenter</code>），默认显示，跟这条报是速报还是最終報没有关系。所以想「发一张不画波的报」，光改报文没用，必须动这个设置——这也是本仓库里 <code>关闭推算震源.bat</code> / <code>恢复PS波显示.bat</code> 那两个脚本做的事，现在已集成进页面，不用再单独跑 bat。</div>
+
+        <h4>常见问题</h4>
+        <ul>
+          <li><b>下拉是灰的 / 显示「服务器不支持」</b> → 服务器是旧版：重启 <code>startserver.bat</code>（<code>server.js</code> 更新后必须重启）再点 ↻。</li>
+          <li><b>提示找不到 Settings.ini</b> → EQuake 至少要先启动过一次，才会生成 <code>%APPDATA%\EQuake\config\Settings.ini</code>。</li>
+          <li><b>改了却还在画波</b> → 没重启 EQuake；或 EQuake 还开着时改的、被它覆盖回去了。选回「显示波前」→ 完全退出 EQuake → 重新打开 → 再选「完全不画波前」→ 再重启一次。</li>
+          <li><b>想还原</b> → 下拉选「显示波前（默认）」；或手动把 <code>Settings.ini.bak</code> 复制回 <code>Settings.ini</code>。</li>
+        </ul>
+      </div>
+
+      <!-- 8 排查 -->
+      <div class="help-sec" data-sec="8">
+        <h4>❓ 常见问题</h4>
+        <h4>Q1. 发布成功了，EQuake 一直不显示（老是罗蒙诺索夫海岭 / 不画震中）</h4>
+        <p>99% 是 EQuake 没拿到有效数据，它显示了内置演示位置。按顺序查：</p>
+        <ol>
+          <li>EQuake 里的数据源地址与页顶订阅地址<b>完全一致</b>（http 开头、不要空格、不要 https）。</li>
+          <li>先<b>点「📤 发布到服务器」</b>，等 1~2 秒再看 EQuake。</li>
+          <li>看顶栏「EQuake 取数」是不是 ✓；再看点开的「服务器日志」——<b>一条请求记录都没有</b> = 地址/端口不通；<b>有记录但仍不显示</b> = 点「载入示例报文」发一条与官方示例一致的作对照，还不行就把日志内容发出来。</li>
+          <li>时区对不上（选了 UTC+8）会让整条报被 EQuake 判为过期而丢掉。</li>
+        </ol>
+
+        <h4>Q2. 只发了前两报，后面的报发不出来</h4>
+        <ul>
+          <li>报数没递增 / 重复了 → 检查每张卡的 reportNum，保证 1、2、3… 严格递增；同 eventID 下报数相同会被当成同一报丢弃。</li>
+          <li>卡片「启用」被取消勾选 → 发布时只发勾上的卡。</li>
+          <li>多条报用了不同的 eventID → EQuake 当成两次地震，第二次会被忽略。</li>
+        </ul>
+
+        <h4>Q3. 地图点不出来 / 一片空白</h4>
+        <p>Leaflet 走 CDN，断网就加载不出来：弹窗会显示「地图组件加载失败」的提示框，此时<b>直接手输经纬度</b>，或用下面的快捷城市按钮；联网后重开弹窗即可。</p>
+
+        <h4>Q4. 刷新页面 / 重启服务器后，之前发的地震没了</h4>
+        <p>「本次服务器已发出的地震」这块是<b>服务器内存里的</b>，服务器重启或页面刷新后清空，属于正常；要接着对同一事件加报，重新填好卡片再发布即可（报数要接着往上加）。本地<b>存档</b>不受影响，还在 localStorage 里，打开后自动恢复。</p>
+
+        <h4>Q5. 想取消已经发出去的地震</h4>
+        <p>在「本次服务器已发出的地震」里找到那条 → 点<b>取消</b>（发一张 isCancel 的报，同一个 eventID、报数 +1）。</p>
+
+        <h4>Q6. 免责声明</h4>
+        <p><b>本程序只向本机 EQuake 发送虚构报文，仅供测试模拟。</b>请勿当作真实预警对外发布、转发，或用于任何可能误导他人的场合。</p>
+      </div>
+
+      </div>
+    </div>
+    <div class="modal-ft">
+      <span class="hint" id="helpPos"></span>
+      <span style="flex:1"></span>
+      <button class="mini" onclick="helpStep(-1)">← 上一段</button>
+      <button class="mini" onclick="helpStep(1)">下一段 →</button>
+      <button class="primary" onclick="closeHelp()">关闭</button>
     </div>
   </div>
 </div>
@@ -278,14 +776,16 @@ function applyApi(){
     }else{
       bn.style.display = 'none';
     }
+    try{ maybeQueryPs(); }catch(e){}   // 连上服务器后读一次 EQuake 当前 P/S 波设置（只查一次）
   }else{
+    psQueried = false;   // 换服务器后重新读一次 EQuake 的 P/S 波设置
     dot.className = '';
     dt.textContent = '未连接';
     s1.textContent = '服务器未启动';
     s2.textContent = 'http://127.0.0.1:' + DEFAULT_PORT + '/json';
     bn.className = 'err';
     bn.style.display = 'block';
-    bn.innerHTML = '未检测到发报服务器：请双击 <code>启动服务器.bat</code>，再用浏览器打开 <code>http://127.0.0.1:' + DEFAULT_PORT + '/</code>。若端口被占用会自动顺延，点右上「设置服务器」也可手动指定。';
+    bn.innerHTML = '未检测到发报服务器：请双击 <code>startserver.bat</code>，再用浏览器打开 <code>http://127.0.0.1:' + DEFAULT_PORT + '/</code>。若端口被占用会自动顺延，点右上「设置服务器」也可手动指定。';
   }
 }
 function reconnect(){ apiReady = false; applyApi(); findServer(); }
@@ -299,7 +799,7 @@ function setServer(){
 async function postJson(path, body, qs){
   if(!apiReady){
     const s = await findServer();
-    if(!s) throw new Error('未检测到发报服务器，请先双击 启动服务器.bat');
+    if(!s) throw new Error('未检测到发报服务器，请先双击 startserver.bat');
   }
   let r;
   try{
@@ -319,8 +819,6 @@ async function postJson(path, body, qs){
   return j;
 }
 
-let map = null, marker = null, baseLayer = null, baseMode = 'amap';
-// 弹窗内独立地图实例（不污染主地图，可独立切底图）
 let moreMap = null, moreMarker = null, moreBaseLayer = null, moreBaseMode = 'amap';
 
 // ---------- 坐标系互转：高德底图 GCJ-02 <-> EQuake 报文 WGS-84 ----------
@@ -374,6 +872,176 @@ function fromDisplay(lat, lng, mode){
   return [w[1], w[0]];
 }
 
+// ---------- 地点搜索：内置地名库（WGS-84 经纬度），模糊匹配，三处地图选点共用 ----------
+// 每条：[名称, 纬度, 经度, "别名/搜索关键词(可含拼音片段)"]；覆盖日本 47 都道府县厅所在地 +
+// 主要城市 + 海域/地震相关地名 + 中国主要城市。离线可用、无需密钥。
+const PLACE_DB = [
+  // —— 日本 47 都道府县厅所在地 ——
+  ['札幌(北海道)',43.06,141.35,'さっぽろ sapporo 北海道'],
+  ['盛岡(岩手)',39.70,141.15,'もりおか morioka 岩手'],
+  ['仙台(宮城)',38.27,140.87,'せんだい sendai 宮城 みやぎ'],
+  ['秋田(秋田)',39.72,140.10,'あきた akita'],
+  ['山形(山形)',38.24,139.95,'やまがた yamagata'],
+  ['福島(福島)',37.76,140.47,'ふくしま fukushima 福岛'],
+  ['水戸(茨城)',36.34,140.45,'みと mito 茨城'],
+  ['宇都宮(栃木)',36.34,139.88,'うつのみや tochigi 栃木'],
+  ['前橋(群馬)',36.39,139.06,'まえばし gunma 群馬'],
+  ['埼玉(埼玉)',35.86,139.65,'さいたま saitama'],
+  ['千葉(千葉)',35.60,140.12,'ちば chiba'],
+  ['東京(東京)',35.69,139.69,'とうきょう tokyo 東京 とうきよう'],
+  ['横浜(神奈川)',35.44,139.64,'よこはま yokohama 神奈川'],
+  ['新潟(新潟)',37.90,139.02,'にいがた niigata'],
+  ['富山(富山)',36.70,137.21,'とやま toyama'],
+  ['金沢(石川)',36.59,136.63,'かなざわ kanazawa 石川'],
+  ['福井(福井)',36.00,136.19,'ふくい fukui'],
+  ['甲府(山梨)',35.66,138.57,'こうふ yamanashi 山梨'],
+  ['長野(長野)',36.65,138.20,'ながの nagano'],
+  ['岐阜(岐阜)',35.39,136.72,'ぎふ gifu'],
+  ['静岡(静岡)',34.98,138.38,'しずおか shizuoka'],
+  ['名古屋(愛知)',35.18,136.91,'なごや nagoya 愛知 あいち'],
+  ['津(三重)',34.73,136.51,'つ mie 三重'],
+  ['大津(滋賀)',35.00,135.87,'おおつ shiga 滋賀'],
+  ['京都(京都)',35.01,135.77,'きょうと kyoto 京都'],
+  ['大阪(大阪)',34.69,135.50,'おおさか osaka 大阪 おおさか'],
+  ['神戸(兵庫)',34.69,135.20,'こうべ kobe 兵庫 ひょうご'],
+  ['奈良(奈良)',34.69,135.80,'なら nara'],
+  ['和歌山(和歌山)',34.23,135.17,'わかやま wakayama'],
+  ['鳥取(鳥取)',35.50,134.24,'とっとり tottori'],
+  ['松江(島根)',35.47,133.05,'まつえ shimane 島根'],
+  ['岡山(岡山)',34.67,133.94,'おかやま okayama'],
+  ['広島(広島)',34.40,132.46,'ひろしま hiroshima 広島'],
+  ['山口(山口)',34.19,131.47,'やまぐち yamaguchi'],
+  ['徳島(徳島)',34.07,134.56,'とくしま tokushima'],
+  ['高松(香川)',34.34,134.04,'たかまつ kagawa 香川'],
+  ['松山(愛媛)',33.84,132.77,'まつやま ehime 愛媛'],
+  ['高知(高知)',33.56,133.53,'こうち kochi'],
+  ['福岡(福岡)',33.59,130.40,'ふくおか fukuoka 福岡'],
+  ['佐賀(佐賀)',33.25,130.30,'さが saga'],
+  ['長崎(長崎)',32.74,129.87,'ながさき nagasaki'],
+  ['熊本(熊本)',32.80,130.71,'くまもと kumamoto'],
+  ['大分(大分)',33.24,131.61,'おおいた oita'],
+  ['宮崎(宮崎)',31.91,131.42,'みやざき miyazaki'],
+  ['鹿児島(鹿児島)',31.56,130.56,'かごしま kagoshima'],
+  ['那覇(沖縄)',26.21,127.68,'なは naha 沖縄 おきなわ'],
+  // —— 日本主要城市/支厅 ——
+  ['函館',41.77,140.73,'はこだて hakodate'],
+  ['旭川',43.77,142.37,'あさひかわ asahikawa'],
+  ['小樽',43.19,141.00,'おたる otaru'],
+  ['帯広',42.92,143.20,'おびひろ obihiro'],
+  ['釧路',42.98,144.38,'くしろ kushiro'],
+  ['青森',40.82,140.74,'あおもり aomori'],
+  ['八戸',40.51,141.49,'はちのへ hachinohe'],
+  ['石巻',38.43,141.30,'いしのまき ishinomaki'],
+  ['いわき',37.05,140.89,'iwaki 磐城'],
+  ['郡山',37.40,140.39,'こおりやま koriyama'],
+  ['会津若松',37.50,139.93,'あいづわかまつ aizuwakamatsu'],
+  ['川越',35.92,139.49,'かわごえ kawagoe'],
+  ['船橋',35.69,139.98,'ふなばし funabashi'],
+  ['柏',35.86,139.97,'かしわ kashiwa'],
+  ['横須賀',35.28,139.67,'よこすか yokosuka'],
+  ['小田原',35.25,139.16,'おだわら odawara'],
+  ['藤沢',35.34,139.49,'ふじさわ fujisawa 湘南'],
+  ['松本',36.24,137.97,'まつもと matsumoto'],
+  ['上田',36.40,138.19,'うえだ uchi'],
+  ['浜松',34.71,137.73,'はままつ hamamatsu'],
+  ['沼津',35.10,138.86,'ぬまづ numazu'],
+  ['豊橋',34.77,137.39,'とよはし toyohashi'],
+  ['四日市',34.97,136.62,'よっかいち yokkaichi'],
+  ['堺',34.57,135.48,'さかい sakai'],
+  ['姫路',34.82,134.69,'ひめじ himeji'],
+  ['明石',34.64,134.99,'あかし akashi'],
+  ['倉敷',34.60,133.77,'くらしき kurashiki'],
+  ['福山',34.49,133.36,'ふくやま fukuyama'],
+  ['下関',33.96,130.94,'しものせき shimonoseki'],
+  ['北九州',33.88,130.88,'きたきゅうしゅう kitakyushu'],
+  ['久留米',33.31,130.51,'くるめ kurume'],
+  ['佐世保',33.16,129.73,'させぼ sasebo'],
+  ['飯塚',33.64,130.69,'いいづか iizuka'],
+  ['宮古島',24.80,125.28,'みやこじま miyakojima'],
+  ['石垣島',24.34,124.16,'いしがきじま ishigakijima'],
+  ['名護',26.59,128.00,'なご nago'],
+  ['中城湾',26.27,127.86,'なかぐすく nakagusuku'],
+  // —— 海域 / 地震相关地名 ——
+  ['日本海',38.00,135.00,'にほんかい sea of japan 日本海'],
+  ['太平洋',30.00,145.00,'たいへいよう pacific'],
+  ['三陸沖',38.30,142.40,'さんりく 三陸 沖'],
+  ['宮城県沖',38.30,142.00,'みやぎけんおき'],
+  ['福島県沖',37.50,141.80,'ふくしまけんおき'],
+  ['茨城県沖',36.20,141.00,'いばらきけんおき'],
+  ['千葉県東方沖',35.20,141.20,'ちばけんとうほうおき'],
+  ['北海道東方沖',43.00,147.00,'ほっかいどうとうほうおき'],
+  ['択捉島',44.00,147.50,'えとろふ iturup'],
+  ['日本以南海域',31.00,142.20,'にほんいなん 南海'],
+  ['東海地方',34.50,138.00,'とうかい tokai'],
+  ['南海トラフ',32.50,135.00,'なんかい torafu 南海トラフ'],
+  ['紀伊半島',33.50,135.50,'きいはんとう kii'],
+  ['駿河湾',35.00,138.50,'するがわん suruga'],
+  ['相模湾',35.10,139.40,'さがみわん sagami'],
+  ['東京湾',35.50,139.80,'とうきょうわん tokyo bay'],
+  ['大阪湾',34.40,135.20,'おおさかわん osaka bay'],
+  ['瀬戸内海',34.30,134.00,'せとないかい seto'],
+  ['伊豆諸島',34.00,139.50,'いずしょとう izu'],
+  ['小笠原諸島',27.00,142.00,'おがさわら bonin'],
+  ['奄美大島',28.20,129.40,'あまみ amami'],
+  ['沖縄本島近海',25.50,127.50,'おきなわほんとう'],
+  ['台湾東方海域',24.45,122.90,'たいわんとうほう 台湾以东海域'],
+  ['台湾',23.70,120.96,'たいわん taiwan'],
+  ['石垣島近海',24.30,124.10,'いしがき'],
+  // —— 中国主要城市 ——
+  ['北京',39.90,116.40,'beijing 北京'],
+  ['上海',31.23,121.47,'shanghai 上海'],
+  ['成都',30.57,104.07,'chengdu 成都'],
+  ['広州',23.13,113.26,'guangzhou 广州'],
+  ['深圳',22.54,114.06,'shenzhen 深圳'],
+  ['重慶',29.56,106.55,'chongqing 重庆'],
+  ['武漢',30.59,114.30,'wuhan 武汉'],
+  ['西安',34.34,108.94,'xian 西安'],
+  ['杭州',30.27,120.15,'hangzhou 杭州'],
+  ['南京',32.06,118.80,'nanjing 南京'],
+  ['天津',39.13,117.20,'tianjin 天津'],
+  ['哈爾濱',45.80,126.53,'harbin 哈尔滨'],
+  ['瀋陽',41.80,123.43,'shenyang 沈阳'],
+  ['青島',36.07,120.38,'qingdao 青岛'],
+  ['鄭州',34.75,113.62,'zhengzhou 郑州'],
+  ['昆明',25.04,102.71,'kunming 昆明'],
+  ['拉薩',29.65,91.14,'lhasa 拉萨'],
+  ['烏魯木斉',43.83,87.62,'urumqi 乌鲁木齐'],
+  ['蘭州',36.06,103.83,'lanzhou 兰州'],
+  ['香港',22.32,114.17,'hongkong 香港'],
+  ['台北',25.03,121.57,'taipei 台北'],
+  ['高雄',22.62,120.30,'kaohsiung 高雄']
+];
+// scope: 'pick' | 'qpe' | 'more'，决定结果容器与点击后调用的定位函数
+function placeSearch(q, scope){
+  const box = document.getElementById(scope + 'Results');
+  if(!box) return;
+  q = (q || '').trim().toLowerCase();
+  if(!q){ box.classList.remove('on'); box.innerHTML = ''; return; }
+  const hits = [];
+  for(const e of PLACE_DB){
+    const name = e[0].toLowerCase(), alias = (e[3] || '').toLowerCase();
+    if(name.indexOf(q) >= 0 || alias.indexOf(q) >= 0){ hits.push(e); if(hits.length >= 12) break; }
+  }
+  if(!hits.length){
+    box.innerHTML = '<div class="place-item" style="cursor:default;color:var(--sub)">没有匹配地点，可直接在上方输入「纬度,经度」</div>';
+    box.classList.add('on'); return;
+  }
+  box.innerHTML = hits.map(e =>
+    '<div class="place-item" onclick="placePick(\'' + scope + '\',' + e[1] + ',' + e[2] + ')">' +
+    '<span class="pl-name">' + e[0] + '</span><span class="pl-ll">' + e[1].toFixed(2) + ', ' + e[2].toFixed(2) + '</span></div>'
+  ).join('');
+  box.classList.add('on');
+}
+function placePick(scope, lat, lng){
+  if(scope === 'qpe') qpeCity(lat, lng);
+  else if(scope === 'more') moreCity(lat, lng);
+  else pickCity(lat, lng);
+  const inp = document.getElementById(scope + 'Search');
+  const box = document.getElementById(scope + 'Results');
+  if(inp) inp.value = '';
+  if(box){ box.classList.remove('on'); box.innerHTML = ''; }
+}
+
 // ---------- 底图瓦片 ----------
 const TILES = {
   amap: {
@@ -389,49 +1057,123 @@ const TILES = {
     sub: '', max: 19, attr: '© OpenStreetMap'
   }
 };
-function applyBase(mode){
-  if(!map) return;
+// ---------- 每张卡独立的「📍 地图选点」弹窗（主页面已无常驻地图） ----------
+let pickMap = null, pickMarker = null, pickBaseLayer = null, pickBaseMode = 'amap';
+let pickCard = null;   // 当前正在选点的是哪一张卡
+// toDisplay / fromDisplay 缺省的底图模式（无主地图了，固定为高德 GCJ-02）
+const baseMode = 'amap';
+
+function openPick(btn){
+  const card = btn.closest('.card');
+  if(!card){ msg('找不到这张报文卡。', false); return; }
+  pickCard = card;
+  const h = card.querySelector('.head b');
+  document.getElementById('pickTitle').textContent = '📍 地图选点 · ' + (h ? h.textContent : '本报');
+  document.getElementById('pickModal').classList.add('on');
+  initPickMap();
+}
+function closePick(){
+  const el = document.getElementById('pickModal');
+  if(el) el.classList.remove('on');
+  if(pickMap){ try{ pickMap.remove(); }catch(e){} }
+  pickMap = null; pickMarker = null; pickBaseLayer = null; pickCard = null;
+}
+function applyPickBase(mode){
+  if(!pickMap) return;
   const t = TILES[mode];
   if(!t) return;
-  baseMode = mode;
-  if(baseLayer) map.removeLayer(baseLayer);
+  pickBaseMode = mode;
+  if(pickBaseLayer) pickMap.removeLayer(pickBaseLayer);
   const opt = { maxZoom: t.max, minZoom: 3, attribution: t.attr };
   if(t.sub) opt.subdomains = t.sub;
-  baseLayer = L.tileLayer(t.url, opt).addTo(map);
-  map.setMaxZoom(t.max);
+  pickBaseLayer = L.tileLayer(t.url, opt).addTo(pickMap);
+  pickMap.setMaxZoom(t.max);
 }
-function switchBase(mode){
-  if(!map || mode === baseMode) return;
-  const c = map.getCenter();
-  const w = fromDisplay(c.lat, c.lng); // 旧底图坐标 -> WGS
-  applyBase(mode);
-  map.setView(toDisplay(w[0], w[1]), map.getZoom());
-  redrawMarkerFromInput();
+function switchPickBase(mode){
+  if(!pickMap || mode === pickBaseMode) return;
+  const c = pickMap.getCenter();
+  const w = fromDisplay(c.lat, c.lng, pickBaseMode); // 旧底图坐标 -> WGS
+  applyPickBase(mode);
+  pickMap.setView(toDisplay(w[0], w[1], pickBaseMode), pickMap.getZoom());
+  redrawPickMarker();
 }
-function setMarker(dlat, dlng){
-  if(!map) return;
-  if(!marker){
-    // interactive:false —— 标记不拦截鼠标事件，点击地图任何位置（含标记所在处）都能稳定重新选点。
-    // 之前用 draggable:true，标记落在光标下会吞掉后续点击，导致“第一次能选、后面点不动”。
-    marker = L.marker([dlat, dlng], { interactive: false }).addTo(map);
-  } else {
-    marker.setLatLng([dlat, dlng]);
-  }
+function setPickMarker(dlat, dlng){
+  if(!pickMap) return;
+  // interactive:false —— 标记不吞点击，点地图任意位置（含标记所在处）都能稳定重选
+  if(!pickMarker) pickMarker = L.marker([dlat, dlng], { interactive: false }).addTo(pickMap);
+  else pickMarker.setLatLng([dlat, dlng]);
 }
-function writeLatLng(lat, lng){
-  const c = document.querySelector('#cards .card:last-child');
-  if(!c) return;
-  c.querySelector('.f-lat').value = lat.toFixed(2);
-  c.querySelector('.f-lng').value = lng.toFixed(2);
+function writePickLatLng(lat, lng){
+  if(!pickCard) return;
+  pickCard.querySelector('.f-lat').value = lat.toFixed(2);
+  pickCard.querySelector('.f-lng').value = lng.toFixed(2);
   render();
+  const info = document.getElementById('pickInfo');
+  if(info) info.textContent = '当前震中：纬度 ' + lat.toFixed(2) + '，经度 ' + lng.toFixed(2) + '（已写入该报）';
 }
-function redrawMarkerFromInput(){
-  if(!map) return;
-  const c = document.querySelector('#cards .card:last-child');
-  if(!c) return;
-  const lat = parseFloat(c.querySelector('.f-lat').value);
-  const lng = parseFloat(c.querySelector('.f-lng').value);
-  if(isFinite(lat) && isFinite(lng)) setMarker.apply(null, toDisplay(lat, lng));
+function redrawPickMarker(){
+  if(!pickMap || !pickCard) return;
+  const lat = parseFloat(pickCard.querySelector('.f-lat').value);
+  const lng = parseFloat(pickCard.querySelector('.f-lng').value);
+  if(isFinite(lat) && isFinite(lng)) setPickMarker.apply(null, toDisplay(lat, lng, pickBaseMode));
+}
+function pickCity(lat, lng){
+  if(pickMap){
+    pickMap.setView(toDisplay(lat, lng, pickBaseMode), 6);
+    setPickMarker.apply(null, toDisplay(lat, lng, pickBaseMode));
+  }
+  writePickLatLng(lat, lng);
+}
+// 把上一张报的坐标搬到本张（多报序列里常用：第二报起沿用同一震中或略作调整）
+function syncPrev(){
+  if(!pickCard) return;
+  const cards = Array.from(pickCard.parentElement.querySelectorAll('.card'));
+  const i = cards.indexOf(pickCard);
+  const prev = i > 0 ? cards[i-1] : null;
+  if(!prev){ msg('这是第一张卡，没有上一报。', false); return; }
+  const lat = parseFloat(prev.querySelector('.f-lat').value);
+  const lng = parseFloat(prev.querySelector('.f-lng').value);
+  if(!isFinite(lat) || !isFinite(lng)){ msg('上一报没有有效坐标。', false); return; }
+  if(pickMap){
+    pickMap.setView(toDisplay(lat, lng, pickBaseMode), pickMap.getZoom());
+    setPickMarker.apply(null, toDisplay(lat, lng, pickBaseMode));
+  }
+  writePickLatLng(lat, lng);
+}
+function initPickMap(){
+  if(pickMap){ try{ pickMap.remove(); }catch(e){} pickMap = null; pickMarker = null; pickBaseLayer = null; }
+  pickBaseMode = 'amap';
+  if(!pickCard) return;
+  const lat0 = parseFloat(pickCard.querySelector('.f-lat').value);
+  const lng0 = parseFloat(pickCard.querySelector('.f-lng').value);
+  const clat = isFinite(lat0) ? lat0 : 35.68, clng = isFinite(lng0) ? lng0 : 139.76;
+  const info = document.getElementById('pickInfo');
+  if(info) info.textContent = '当前震中：纬度 ' + clat.toFixed(2) + '，经度 ' + clng.toFixed(2);
+  withLeaflet(ok => {
+    const fb = document.getElementById('pickFallback');
+    const mp = document.getElementById('pickMap');
+    if(!ok){
+      if(mp) mp.style.display = 'none';
+      if(fb) fb.style.display = 'flex';
+      return;
+    }
+    if(mp) mp.style.display = '';
+    if(fb) fb.style.display = 'none';
+    try{
+      pickMap = L.map('pickMap', { center: toDisplay(clat, clng, pickBaseMode), zoom: 5, minZoom: 3 });
+      applyPickBase(pickBaseMode);
+      pickMap.on('click', e => {
+        const w = fromDisplay(e.latlng.lat, e.latlng.lng, pickBaseMode); // w = [纬度, 经度]
+        const lat = Math.round(w[0]*100)/100, lng = Math.round(w[1]*100)/100;
+        setPickMarker.apply(null, toDisplay(lat, lng, pickBaseMode));
+        writePickLatLng(lat, lng);
+      });
+      setPickMarker.apply(null, toDisplay(clat, clng, pickBaseMode));
+      const sel = document.getElementById('pickBaseSel');
+      if(sel){ sel.value = pickBaseMode; sel.onchange = ev => switchPickBase(ev.target.value); }
+      setTimeout(()=>{ if(pickMap) pickMap.invalidateSize(); }, 60); // 弹窗由 display:none 变可见，需重算尺寸
+    }catch(e){ if(mp) mp.style.display='none'; if(fb) fb.style.display='flex'; }
+  });
 }
 
 const selI = ['不明','1','2','3','4','5-','5+','6-','6+','7'];
@@ -442,24 +1184,86 @@ function intOpts(arr){
   return '<option value="" selected>EQuake 计算</option>' + arr.map(x=>'<option>'+x+'</option>').join('');
 }
 
-function nowJST(){
-  const t = new Date(Date.now() + (9*60 + new Date().getTimezoneOffset())*60000);
+// 同 intOpts，但可以指定当前选中的值（预设编辑框用）
+function intOptsSel(arr, val){
+  const cur = (val == null) ? '' : String(val);
+  return '<option value="">EQuake 计算</option>' + arr.map(x=>'<option'+(x===cur?' selected':'')+'>'+x+'</option>').join('');
+}
+// ---------- 时间口径：报文里的时刻串按 TZ_H 时区解读（默认 UTC+9，可切 UTC+8）----------
+// msToJST/nowJST：真实时刻 -> 墙上时间串；tsToMs：墙上时间串 -> 真实时刻（互为反函数，进位交给 Date 算）
+// 【为什么默认 UTC+9】EQuake 内部按 JST(UTC+9) 解读报文时刻串，填 UTC+8 它认为地震早了 1 小时、整条不显示。
+let TZ_H = 9;
+function msToJSTms(ms){ return ms + TZ_H * 3600000; }
+function msToJST(ms){
+  const d = new Date(msToJSTms(ms));
   const p = n => String(n).padStart(2,'0');
-  return t.getFullYear()+'/'+p(t.getMonth()+1)+'/'+p(t.getDate())+' '+p(t.getHours())+':'+p(t.getMinutes())+':'+p(t.getSeconds());
+  return d.getUTCFullYear()+'/'+p(d.getUTCMonth()+1)+'/'+p(d.getUTCDate())+' '+p(d.getUTCHours())+':'+p(d.getUTCMinutes())+':'+p(d.getUTCSeconds());
+}
+function nowJST(){ return msToJST(Date.now()); }
+// 给「时刻串」加 n 秒（自动进位：秒→分→时→日→月→年都由 Date 处理；支持 24+ 时制）
+function addSecToTs(s, n){
+  const ms = tsToMs(s);
+  if(ms === null) return null;
+  return msToJST(ms + n * 1000);
 }
 function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
-// 发震时刻字符串 -> 时间戳（字符串按 UTC+9 解读）
+// ---------- 本项目（本地）震度算法：按「震级 + 震源深度」推最大震度与长周期地震动等级 ----------
+// maxIntensity = 震中（最烈点）处震度，不需经纬度。以 10km 为基准：s = M-0.2 - 0.6*log10(h/10)，
+// 深度每增一个数量级震度降约 0.6 档，h<10km 极浅源放大、h 越深衰减越明显。
+function calcIntensity(mag, depth){
+  const M = isFinite(parseFloat(mag)) ? parseFloat(mag) : 5;
+  const h = Math.max(1, isFinite(parseFloat(depth)) && parseFloat(depth) > 0 ? parseFloat(depth) : 10);
+  let s = M - 0.2 - 0.6 * Math.log10(h / 10);
+  if(s < 0.3) s = 0.3;
+  if(s > 7) s = 7;
+  let imi;
+  if(s < 0.6) imi = '不明';
+  else if(s < 1.6) imi = '1';
+  else if(s < 2.6) imi = '2';
+  else if(s < 3.6) imi = '3';
+  else if(s < 4.6) imi = '4';
+  else if(s < 5.5) imi = '5-';
+  else if(s < 6.0) imi = '5+';
+  else if(s < 6.5) imi = '6-';
+  else if(s < 6.9) imi = '6+';
+  else imi = '7';
+  // 长周期地震动等级（0~4）：大震近场才明显，随震级增长（M6 起 0~1 级，M9 约 2 级）
+  let lg = (M - 6.0) * 0.7 + 0.45;
+  lg = Math.max(0, Math.min(4, Math.round(lg)));
+  return { imi: imi, lgi: String(lg) };
+}
+// 用「本项目算法」刷新一张卡的震度 / 长周期等级（会解除 isCSIS 的强制勾选）
+function applyLocalInt(btn){
+  const c = btn.closest('.card') || btn;
+  const r = calcIntensity(c.querySelector('.f-mag').value, c.querySelector('.f-dep').value);
+  const csis = c.querySelector('.f-csis');
+  csis.checked = false;
+  csis.disabled = false;
+  c.querySelector('.f-imi').value = r.imi;
+  c.querySelector('.f-lgi').value = r.lgi;
+  if(c._upd) c._upd();
+  render();
+  msg('已用本项目算法算出：M' + c.querySelector('.f-mag').value + ' / 深 ' + c.querySelector('.f-dep').value +
+      ' km → 最大震度 ' + r.imi + '，长周期地震动等级 ' + r.lgi + '（已直接填入，EQuake 不再自行推算）。', true);
+}
+// 发震时刻字符串 -> 真实时刻（字符串按 TZ_H 时区解读，与 msToJST 互为反函数）
 function tsToMs(s){
   if(typeof s !== 'string') return null;
   const m = s.match(/(\d{4})\/(\d{1,2})\/(\d{1,2})\s+(\d{1,3}):(\d{2}):(\d{2})/);
   if(!m) return null;
   let h = parseInt(m[4],10); const day = Math.floor(h/24); h = h%24; // 支持 JMA 24+ 时制
-  return Date.UTC(+m[1], +m[2]-1, +m[3], h, +m[5], +m[6]) + day*86400000;
+  return Date.UTC(+m[1], +m[2]-1, +m[3], h, +m[5], +m[6]) + day*86400000 - TZ_H*3600000;
 }
 // 未勾选「波从震中重新发出」却填了很早的发震时刻 -> EQuake 里波已经跑了一大段
 function staleWarn(arr){
   const out = [];
+  const lastNum = {};  // 同一次地震里已出现的最大报数：报数不递增，EQuake 会当成旧报丢弃
   arr.forEach((d,i)=>{
+    if(d.eventID){
+      if(lastNum[d.eventID] !== undefined && d.reportNum <= lastNum[d.eventID])
+        out.push('第'+(i+1)+'报 报数 '+d.reportNum+' 不大于同一次地震已排的第 '+lastNum[d.eventID]+' 报，EQuake 会当成旧报丢弃（续报请把报数递增）');
+      else lastNum[d.eventID] = d.reportNum;
+    }
     const la = parseFloat(d.latitude), lo = parseFloat(d.longitude);
     if(!isFinite(la) || !isFinite(lo)) out.push('第'+(i+1)+'报 经纬度不是数字，EQuake 可能定位失败');
     else if(la < -90 || la > 90 || lo < -180 || lo > 180) out.push('第'+(i+1)+'报 经纬度超出常规范围（lat='+la+' lon='+lo+'），EQuake 可能把震中画到极区');
@@ -467,7 +1271,7 @@ function staleWarn(arr){
     if(SENT_ITEMS.some(x => x.eventID === d.eventID)) return;
     const t = tsToMs(d.shockTime);
     if(t === null || d.reStamp || (d.waveElapsed !== null && d.waveElapsed !== undefined)) return;
-    const lag = Math.round(Math.abs(Date.now() - (t - 9*3600000)) / 1000); // 时间串按 UTC+9 解读, 真实时间 = t - 9h
+    const lag = Math.round(Math.abs(Date.now() - t) / 1000); // tsToMs 已按 TZ_H 折算成真实时刻
     if(lag > 60){
       const mm = Math.floor(lag/60), ss = lag%60;
       out.push('第'+(i+1)+'报 发震时刻比现在早 '+mm+' 分 '+ss+' 秒，EQuake 里地震波会已经跑了一大段（要控制波的起点：勾「波从震中重新发出」= 送达时从震中出发，或填「震波已发出(秒)」指定已扩出的距离）');
@@ -477,31 +1281,46 @@ function staleWarn(arr){
 }
 
 function addCard(host){
-  const box = host || document.getElementById('cards');
+  const box = host || curBox();
   const n = box.children.length + 1;
+  // 同一批报必须共用一个 eventID：新添加的报沿用上一张的编号，EQuake 才认作同一次地震的续报。
+  // 报数也必须递增（EQuake 会忽略报数不大于已收到报数的报文，报数相同就直接被当成同一报丢弃）
+  const cards = box.querySelectorAll('.card');
+  const prevCard = cards.length ? cards[cards.length - 1] : null;   // 只认卡片，跳过地图等其它元素
+  const prevIdEl = prevCard && prevCard.querySelector('.f-id');
+  // 新卡沿用「上一个编号」；一个都没有（这一页的第一张）时，用该分页自己的 eventID
+  // （切页时面板上的 msEid 就是这一页的编号），这样分页栏显示的编号和卡里的对得上
+  const panelEl = document.getElementById('msEid');
+  const panelId = panelEl ? panelEl.value.trim() : '';
+  const evId = (prevIdEl && prevIdEl.value.trim()) ? prevIdEl.value.trim()
+    : (panelId ? panelId : ('EQ_' + Date.now()));
   const div = document.createElement('div');
   div.className = 'card';
   div.innerHTML =
   '<div class="head"><b>第 '+n+' 报</b>' +
     '<label class="chk" style="color:var(--txt)"><input type="checkbox" class="f-en" checked> 启用</label>' +
+    '<span class="officialTag">📋 正式报</span>' +
     '<span style="flex:1"></span>' +
     '<button class="mini" onclick="preset(this,\'eew\')">EEW 速报</button>' +
     '<button class="mini" onclick="preset(this,\'plum\')">PLUM</button>' +
     '<button class="mini" onclick="preset(this,\'final\')">最终报告</button>' +
+    '<button class="mini" onclick="preset(this,\'official\')" title="正式报（确定报）：isFinal + 确定震度 + 不重发波；配合工具栏「关闭 P/S 波」使用，EQuake 里就是没有 P/S 波前的正式报">📋 正式报</button>' +
     '<button class="mini" onclick="preset(this,\'cancel\')">取消报</button>' +
-    '<button class="mini danger" onclick="this.closest(\'.card\').remove();renum()">删除</button>' +
+    '<button class="mini" onclick="applyLocalInt(this)" title="按本卡的震级+深度，用本项目的算法直接算出最大震度与长周期地震动等级并填入">📐 算震度</button>' +
+    '<button class="mini" onclick="openPick(this)">📍 地图选点</button>' +
+    '<button class="mini danger" onclick="this.closest(\'.card\').remove();renum();bumpTab()">删除</button>' +
   '</div>' +
   '<div class="grid">' +
-    '<label>eventID 事件ID<input type="text" class="f-id" value="EQ_'+Date.now()+'"><span><button class="mini" onclick="reid(this)">换一个</button></span></label>' +
+    '<label>eventID 事件ID<input type="text" class="f-id" value="'+esc(evId)+'"><span><button class="mini" onclick="reid(this)" title="换一个（同一 eventID 的所有报会一起换，保证同一批报编号一致）">换一个</button></span></label>' +
     '<label>sourceName 信息源<input type="text" class="f-src" list="srcList" value="JMA"></label>' +
     '<label>placeName 位置名（留空=软件内部地名库）<input type="text" class="f-place" placeholder="如：青森県東方沖"></label>' +
     '<label>latitude 纬度<input type="number" step="0.1" class="f-lat" value="35.68"></label>' +
     '<label>longitude 经度<input type="number" step="0.1" class="f-lng" value="139.76"></label>' +
     '<label>depth 深度(km)<input type="number" step="1" class="f-dep" value="10"></label>' +
     '<label>magnitude 震级<input type="number" step="0.1" class="f-mag" value="5.0"></label>' +
-    '<label>reportNum 第几报<input type="number" step="1" class="f-num" value="1" min="1"></label>' +
-    '<label>reportTime 发布时刻(UTC+9)<span class="rowflex"><input type="text" class="f-rt"><button class="mini" onclick="setNow(this,\'rt\')">现在</button></span></label>' +
-    '<label>shockTime 发震时刻(UTC+9)<span class="rowflex"><input type="text" class="f-st"><button class="mini" onclick="setNow(this,\'st\')">现在</button></span></label>' +
+    '<label>reportNum 第几报<input type="number" step="1" class="f-num" value="'+n+'" min="1"></label>' +
+    '<label title="报文的发布时间；与发震时刻各自独立填写">reportTime 发布时刻<span class="rowflex"><input type="text" class="f-rt"><button class="mini" onclick="setNow(this,\'rt\')">现在</button></span></label>' +
+    '<label title="地震发生的时刻；比发布时刻早 = 地震波已经跑了一段，波已经向外扩出相应距离">shockTime 发震时刻<span class="rowflex"><input type="text" class="f-st"><button class="mini" onclick="setNow(this,\'st\')">现在</button></span></label>' +
     '<label>waveStart 震波已发出(秒)<input type="number" step="1" min="0" class="f-wave" placeholder="留空=继着上波"><span class="wavekm"></span></label>' +
     '<label>maxIntensity 最大震度<select class="f-imi">'+intOpts(selI)+'</select></label>' +
     '<label>maxLgInt 长周期地震动等级<select class="f-lgi">'+intOpts(selL)+'</select></label>' +
@@ -518,33 +1337,218 @@ function addCard(host){
   '<div class="cardHint"></div>';
   box.appendChild(div);
   div.querySelectorAll('input,select').forEach(el=>el.addEventListener('input',render));
+  wireTimeSync(div);   // 发布时刻 / 发震时刻联动（受工具栏「始终同步」开关控制）
   const waveInp = div.querySelector('.f-wave');
   if(waveInp) waveInp.addEventListener('input', ()=>{ updateWaveKm(div); render(); });
   setNow(div.querySelector('.f-rt'),'rt');
   setNow(div.querySelector('.f-st'),'st');
   wireChecks(div);
   render();
+  bumpTab();
   return div;
 }
+// 分页栏上的「N 报」计数跟着卡片增减走
+function bumpTab(){ if(typeof renderTabBar === 'function') renderTabBar(); }
+// 头部「第 N 报」跟着 .f-num（用户可能手改成续报编号）走，而不是简单按位置排，
+// 免得删卡后显示与实际报数对不上（后面 sendPlan 会把重复的报数自动理顺）
 function renum(){
-  document.querySelectorAll('#cards .card b').forEach((b,i)=>b.textContent='第 '+(i+1)+' 报');
+  document.querySelectorAll('#cards .card').forEach((c,i)=>{
+    const b = c.querySelector('.head b'); if(!b) return;
+    const f = c.querySelector('.f-num'); const v = parseFloat(f && f.value);
+    b.textContent = '第 ' + ((isFinite(v) && v >= 1) ? v : (i + 1)) + ' 报';
+  });
 }
+// 「换一个」：同一批报共用一个 eventID，所以把同一宿主里使用旧编号的报一起换掉，
+// 避免只换一张导致这批报被拆成两次地震（续报失效、后面的报被 EQuake 忽略）。
+// 想让某一张单独另起编号，直接在输入框里手打即可（手打只改这一张）。
 function reid(btn){
   const c = btn.closest('.card');
-  c.querySelector('.f-id').value = 'EQ_'+Date.now();
+  const el = c.querySelector('.f-id');
+  const old = el.value.trim();
+  const nv = 'EQ_' + Date.now();
+  let cnt = 0;
+  const box = c.parentElement || curBox();
+  box.querySelectorAll('.card .f-id').forEach(x=>{ if(x.value.trim() === old){ x.value = nv; cnt++; } });
   render();
+  if(cnt > 1) msg('已把同编号的 ' + cnt + ' 张报一起换成新 eventID ' + nv + '（同一批报保持同一个编号，EQuake 才认作同一次地震）。', true);
+}
+// 【已移除】「发震/发布时刻始终同步」：两个时刻永远各自独立填写，互不联动、不自动走时
+function syncOn(){ return false; }
+// 工具栏开关：开=立刻把当前分页所有卡片的发震时刻对齐到发布时刻；关=允许两者各填各的
+function onSyncToggle(){
+  // 【已移除】「始终同步」开关已不存在，两个时刻永远各自独立
+  msg('「发震/发布时刻始终同步」功能已移除：现在两个时刻各自独立填写，互不联动，也不会自动跳动。要发震时刻早于发布时刻（波已跑一段）就直接各填各的。', true);
+
+}
+// 「每秒持续同步」：告诉服务器在 EQuake 每次取数时把两个时刻刷成当前时刻
+async function toggleLive(){
+  // 「每秒持续同步」功能已移除：它会让 EQuake 拿到的发震时刻每秒被改写，地震波永远扩不出去
+  const el = document.getElementById('liveSync');
+  if(el) el.checked = false;
+  msg('「每秒持续同步」功能已移除（它会让地震波每秒被重置回震中，EQuake 看不到波扩散）。时刻现在只由你填写或点「现在」。', true);
+
+}
+// ---- 每秒走时：勾了「始终同步」后，卡片里两个时刻每秒自动 +1 秒（进位由 Date 处理）----
+let syncTickId = null;
+// 走时锚点：不再「每秒 +1 秒地累加」（累加会因卡顿/多计时器而跑快跑慢），
+// 而是记下「锚定瞬间的真实时钟 + 那一刻的字面值」，之后每秒按真实时钟走过的毫秒推进。
+// 这样时刻永远等于「锚点值 + 真实经过时间」，不漂也不快。
+const tickAnch = new WeakMap();
+function startSyncTick(){
+  if(syncTickId) return;
+  syncTickId = setInterval(tickTimes, 1000);
+}
+function stopSyncTick(){
+  if(syncTickId){ clearInterval(syncTickId); syncTickId = null; }
+}
+function tickTimes(){
+  if(!syncOn()) return;
+  const box = curBox();
+  if(!box) return;
+  const nowR = Date.now();
+  let n = 0;
+  box.querySelectorAll('.card').forEach(c => {
+    ['.f-rt', '.f-st'].forEach(sel => {
+      const el = c.querySelector(sel);
+      if(!el) return;
+      const v = el.value.trim();
+      if(!v) { tickAnch.delete(el); return; }
+      const ms = tsToMs(v);
+      if(ms === null) { tickAnch.delete(el); return; }
+      let a = tickAnch.get(el);
+      // 值不是我们上次写进去的（用户手改过 / 初次接管）→ 以当前真实时钟重新锚定
+      if(!a || a.val !== v){
+        tickAnch.set(el, { real: nowR, ms: ms, val: v });
+        return;
+      }
+      const nv = msToJST(a.ms + (nowR - a.real));
+      if(nv && nv !== v){ el.value = nv; a.val = nv; tickAnch.set(el, a); n++; }
+    });
+  });
+  if(n) render();   // 同步预览里的时刻
+}
+// 当前分页第一张卡的发布时刻 与 本机现在 差多少秒（正 = 卡片时刻比本机快/超前）
+function firstCardDrift(){
+  const box = curBox(); if(!box) return null;
+  const el = box.querySelector('.card .f-rt'); if(!el) return null;
+  const ms = tsToMs(el.value.trim()); if(ms === null) return null;
+  return Math.round((ms - Date.now()) / 1000);
+}
+function fmtGap(s){
+  s = Math.abs(Math.round(s));
+  if(s < 60) return s + ' 秒';
+  if(s < 3600) return Math.floor(s / 60) + ' 分 ' + (s % 60) + ' 秒';
+  return Math.floor(s / 3600) + ' 小时 ' + Math.floor((s % 3600) / 60) + ' 分';
+}
+// 本机时钟显示（每秒刷），随时可跟卡片时刻对照
+let clkId = null;
+function startClock(){
+  if(clkId) return;
+  const upd = ()=>{ const el = document.getElementById('clkNow'); if(el) el.textContent = nowJST().slice(11); };
+  upd(); clkId = setInterval(upd, 1000);
+}
+// 把当前分页所有卡片的时刻一次性设成本机现在，并重新锚定（彻底消除累积偏差）
+function alignAllNow(){
+  const box = curBox(); if(!box) return;
+  const v = nowJST();
+  let n = 0;
+  box.querySelectorAll('.card').forEach(c => {
+    const rt = c.querySelector('.f-rt'), st = c.querySelector('.f-st');
+    if(rt){ rt.value = v; tickAnch.delete(rt); n++; }
+    if(st){ st.value = v; tickAnch.delete(st); }
+  });
+  render();
+  msg('已把当前分页 ' + n + ' 张卡的发布/发震时刻对齐到本机现在 ' + v + '（UTC+' + TZ_H + '）。', true);
+}
+// 时区切换（UTC+8 / UTC+9）：页面与服务器用同一口径，否则解析会差 1 小时
+async function setTZ(h){
+  TZ_H = (parseInt(h, 10) === 9) ? 9 : 8;
+  try{ localStorage.setItem('eqTZ', String(TZ_H)); }catch(e){}
+  const sel = document.getElementById('tzSel');
+  if(sel) sel.value = String(TZ_H);
+  try{ if(apiReady) postJson('/tz', JSON.stringify({ off: TZ_H })); }catch(e){}
+  msg('时刻口径已切到 UTC+' + TZ_H + '：新填的时刻、点「现在」、每秒走时都按这个时区；已填在卡片里的旧时刻不会自动换算，需要的话点一下「现在」重取。', true);
+}
+// 卡片内两个时刻联动：同步开启时，改一个另一个立即跟着变
+function wireTimeSync(c){
+  const rt = c.querySelector('.f-rt'), st = c.querySelector('.f-st');
+  if(!rt || !st) return;
+  const cp = (src, dst) => { if(!syncOn()) return; dst.value = src.value; render(); };
+  rt.addEventListener('input', ()=>cp(rt, st));
+  st.addEventListener('input', ()=>cp(st, rt));
+  paintSyncBtn(c);
+}
+// 卡片上那个「🔗 同步 / ⛓ 分开」按钮：直接切全局开关，不用跑回工具栏找
+function toggleSyncFrom(btn){
+  // 【已移除】卡片上的同步按钮已不存在
+  msg('时刻同步功能已移除：发布时刻与发震时刻各自独立填写。', true);
+
+}
+// 把所有卡片上的同步按钮、以及被联动的输入框刷成当前状态
+function refreshSyncBtns(){
+  document.querySelectorAll('.card').forEach(c => paintSyncBtn(c));
+}
+function paintSyncBtn(c){
+  const b = c.querySelector('.f-synct'), st = c.querySelector('.f-st'), rt = c.querySelector('.f-rt');
+  if(!b) return;
+  const on = syncOn();
+  b.textContent = on ? '🔗 同步' : '⛓ 分开';
+  b.classList.toggle('free', !on);
+  b.title = on ? '当前：发震时刻跟随发布时刻 → 点一下改成「分开设置」（两个时刻各填各的）'
+               : '当前：两个时刻分开设置（普通设置）→ 点一下改成「始终同步」';
+  if(st) st.classList.toggle('linked', on);
+  if(rt) rt.classList.toggle('linked', on);
+}
+// 生成多报序列时的「是否同步」：弹窗里的勾优先，其次用主页面板那个
+function syncSeriesOpt(){
+  // 【已移除】时刻同步：整条序列始终沿用末报那个发震时刻，发布时刻逐报递增
+  return false;
 }
 function setNow(el,kind){
   el.value = nowJST();
+  // 同步开启时：点「现在」两个时刻一起刷成同一时刻（否则会出现发布时刻比发震时刻早的倒挂）
+  if(syncOn()){
+    const c = el.closest ? el.closest('.card') : null;
+    if(c){
+      const rt = c.querySelector('.f-rt'), st = c.querySelector('.f-st');
+      if(rt) rt.value = el.value;
+      if(st) st.value = el.value;
+    }
+  }
   render();
 }
 function preset(btn,kind){
   const c = btn.closest('.card');
   const q = s => c.querySelector(s);
+  // 点别的报种就退出「正式报」模式（正式报是 isFinal 确定报的一个快捷组合，不是 EQuake 报文里的独立字段）
+  if(kind !== 'official') paintOfficial(c, false);
   if(kind==='eew'){ q('.f-csis').checked=true; q('.f-plum').checked=false; q('.f-final').checked=false; q('.f-cancel').checked=false; q('.f-rest').checked=true; }
   if(kind==='plum'){ q('.f-plum').checked=true; q('.f-csis').checked=false; q('.f-final').checked=false; q('.f-rest').checked=true; }
   if(kind==='final'){ q('.f-final').checked=true; q('.f-cancel').checked=false; q('.f-csis').checked=false; q('.f-rest').checked=false; }
   if(kind==='cancel'){ q('.f-cancel').checked=true; q('.f-rest').checked=false; }
+  if(kind==='official'){
+    // 正式报（確定報）：震源/震级/震度都已确定，不交给 EQuake 推算，也不重发地震波。
+    // EQuake 自定义源只有 EEW 一条通道，没有独立的「地震情報」报文类型；
+    // 所以正式报 = isFinal + 具体震度(不置空、不勾 isCSIS) + 不重发波，
+    // 再配合工具栏「关闭 P/S 波」把推算震源的波前关掉，EQuake 里就是一张没有 P/S 波的正式报。
+    q('.f-final').checked = true;
+    q('.f-cancel').checked = false;
+    q('.f-plum').checked = false;
+    q('.f-rest').checked = false;      // 继着上一次波，不重置
+    q('.f-wave').value = '';           // 不给头程，避免把波重新推远
+    const r = calcIntensity(q('.f-mag').value, q('.f-dep').value);
+    q('.f-imi').value = r.imi;         // 确定震度：不能留空，否则 EQuake 会按「不明」/CSIS 处理
+    q('.f-lgi').value = r.lgi;
+    q('.f-csis').checked = false;
+    paintOfficial(c, true);
+    if(c._upd) c._upd();               // 先刷新联动（震度有具体值后会解锁 isCSIS）
+    q('.f-csis').checked = false;      // 再确保正式报不勾 isCSIS
+    render();
+    msg('已设为「正式报」：isFinal + 确定震度 ' + r.imi + '（按 M' + q('.f-mag').value + ' / 深 ' + q('.f-dep').value + ' km 算出）+ 不重发波。' +
+        '要 EQuake 完全不画 P/S 波前，请在工具栏把「P/S 波」切到「完全关闭」并重启 EQuake。', true);
+    return;
+  }
+  if(c._upd) c._upd(); // 预设改了 isCSIS，要刷新「EQuake 计算」联动
   render();
 }
 function wireChecks(card){
@@ -554,9 +1558,28 @@ function wireChecks(card){
     const imi = card.querySelector('.f-imi').value;
     const lgi = card.querySelector('.f-lgi').value;
     const wv = parseFloat(card.querySelector('.f-wave').value);
+    const fin = card.querySelector('.f-final').checked;   // 最终报告：尊重用户对 isCSIS 的选择，不强制锁定
+    const wasLocked = csis.disabled;                       // 进入本函数前是否处于「震度置空→被强制锁定」状态
     let t = '';
-    if(csis.checked) t = 'isCSIS=true：maxIntensity 与 maxLgInt 将输出为空，由 EQuake 自行计算震度。';
-    else if(imi === '' || lgi === '') t = '「EQuake 计算」：震度留空，由 EQuake 根据震级与震中距自行推算（不写具体值、也不显示「不明」）。';
+    if(imi === '' || lgi === ''){
+      if(fin){
+        // 最终报告允许「只勾 isFinal、不勾 isCSIS」，即便震度置空也不强制锁上 isCSIS
+        // 若该 isCSIS 之前是被「震度置空」强制锁定的，勾上 isFinal 时一并解锁并默认取消（最终报告默认不靠系统算震度）
+        csis.disabled = false;
+        if(wasLocked) csis.checked = false;
+        if(csis.checked) t = 'isCSIS=true：震度置空交给 EQuake 计算（最终报告也允许）。';
+        else t = '⚠ 震度已置空但未勾 isCSIS：这张最终报告 EQuake 可能按「不明」处理；确需系统推算请勾 isCSIS。';
+      } else {
+        // 官方要求：置空必须同时 isCSIS=true，否则 EQuake 不会自行计算、会显示成「不明」
+        csis.checked = true;
+        csis.disabled = true;      // 锁住，避免手动取消后又变回「不明」
+        t = '「EQuake 计算」：maxIntensity / maxLgInt 置空，并自动勾选 isCSIS=true（EQuake 官方要求两者同时成立才自行推算烈度；只置空不勾会显示成「不明」）。';
+      }
+    } else {
+      csis.disabled = false;
+      if(wasLocked) csis.checked = false;   // 从「强制锁定」切到有具体震度：默认不勾 isCSIS（填了值就不需要系统算）
+      if(csis.checked) t = 'isCSIS=true：maxIntensity 与 maxLgInt 将输出为空，由 EQuake 自行计算震度。';
+    }
     if(!isNaN(wv) && wv >= 0){ t += (t ? ' ' : '') + '震波已发出 ' + wv + ' 秒：送达时按此距离重发（波已向外扩约 ' + (wv * 7).toFixed(0) + ' km），不继着上一次波。'; }
     else if(rest.checked) t += (t ? ' ' : '') + '波从震中重新发出：送达时刻改写发震时刻，波刚从震中出发。';
     else t += (t ? ' ' : '') + '继着上一次地震波：送达时不重置，波接着上一报继续向外扩。';
@@ -567,11 +1590,17 @@ function wireChecks(card){
   rest.addEventListener('change', upd);
   card.querySelector('.f-imi').addEventListener('change', upd);
   card.querySelector('.f-lgi').addEventListener('change', upd);
+  card._upd = upd;   // 供 fillCard / preset 改完值后手动刷新（否则 isCSIS 的联动禁用状态不会更新）
   upd();
 }
 function cardJson(card){
   const q = s => card.querySelector(s);
-  const csis = q('.f-csis').checked;
+  const imiV = q('.f-imi').value, lgiV = q('.f-lgi').value;
+  // EQuake 官方说明（设置项 400 注 1）：「当 isCSIS 为 true 时请将 maxIntensity 与 maxLgInt 项置空，EQuake 将自行计算烈度」
+  // 所以选「EQuake 计算」（值为空）必须连带 isCSIS=true；只置空、不勾 isCSIS，EQuake 会当成「不明」
+  const isFin = q('.f-final').checked;                       // 最终报告尊重用户对 isCSIS 的选择，不强制勾上
+  const needCsis = (imiV === '' || lgiV === '') && !isFin;
+  const csis = q('.f-csis').checked || needCsis;
   const lat = parseFloat(q('.f-lat').value)||0;
   const lng = parseFloat(q('.f-lng').value)||0;
   return {
@@ -584,24 +1613,69 @@ function cardJson(card){
     shockTime: q('.f-st').value.trim(),
     reportNum: parseInt(q('.f-num').value)||1,
     magnitude: parseFloat(q('.f-mag').value)||0,
-    maxIntensity: csis ? '' : q('.f-imi').value,
-    maxLgInt: csis ? '' : q('.f-lgi').value,
+    maxIntensity: csis ? '' : imiV,
+    maxLgInt: csis ? '' : lgiV,
     isCSIS: csis,
     isPLUM: q('.f-plum').checked,
     isCancel: q('.f-cancel').checked,
     isFinal: q('.f-final').checked,
+    official: card.dataset.official === '1',   // 仅本项目 UI 用；服务器送达 EQuake 前会剥掉，不进官方报文
     sourceName: q('.f-src').value.trim() || 'UNKNOWN',
     delaySec: Math.max(0, parseFloat(q('.f-delay').value) || 0),
     reStamp: q('.f-rest').checked,
     waveElapsed: (() => { const v = q('.f-wave').value.trim(); return v === '' ? null : Math.max(0, parseFloat(v) || 0); })()
   };
 }
-function buildArray(){
+// 当前分页的卡片容器：一律按分页对象取，不靠节点 id（多个分页容器可能同时挂着同一个 id，靠 id 找会串页）
+function curBox(){
+  try{ const t = TABS[CUR]; return (t && t.box) || document.getElementById('cards'); }
+  catch(e){ return document.getElementById('cards'); }
+}
+// 取报文：显式给 box（分页容器）就只发那一页，不给就取当前分页
+function buildArray(host){
+  const base = host || curBox();
+  if(!base) return [];
   const out = [];
-  document.querySelectorAll('#cards .card').forEach(c=>{
-    if(c.querySelector('.f-en').checked) out.push(cardJson(c));
+  base.querySelectorAll('.card').forEach(c=>{
+    if(c.querySelector('.f-en').checked){
+      const d = cardJson(c);
+      d._card = c;          // 带上卡片本体，发布前有重复报数时好写回输入框（不会进 JSON）
+      out.push(d);
+    }
   });
   return out;
+}
+// 防呆：同一 eventID 里报数重复（删卡、导入存档、复制分页都可能造成），EQuake 只会认下前几条，
+// 后面的会被当成同一报丢掉 —— 表现就是「后面几报发不出来 / 页面上看只有前两报」。
+// 这里只把「撞号」的那几条往后顺延，第一条的基数值（比如接着已发过的 5、6 发续报）保持不动。
+function fixDupNums(arr){
+  const seen = {}, last = {};
+  let fixed = 0;
+  arr.forEach(d=>{
+    const k = d.eventID + '#' + d.reportNum;
+    if(seen[k] !== undefined){
+      d.reportNum = Math.max(1, (last[d.eventID] == null ? d.reportNum : last[d.eventID] + 1));
+      last[d.eventID] = d.reportNum;
+      fixed++;
+    }else{
+      seen[k] = 1;
+      last[d.eventID] = d.reportNum;
+    }
+  });
+  if(!fixed) return 0;
+  arr.forEach(d=>{
+    if(!d._card) return;
+    const f = d._card.querySelector('.f-num');
+    if(f) f.value = d.reportNum;
+  });
+  return fixed;
+}
+// 某一分页里「启用中的报数 / 总卡片数」（供分页按钮与发布前提示用）
+function tabCount(t){
+  if(!t || !t.box) return { en:0, all:0 };
+  let en = 0, all = 0;
+  t.box.querySelectorAll('.card').forEach(c=>{ all++; if(c.querySelector('.f-en').checked) en++; });
+  return { en:en, all:all };
 }
 function render(){
   document.getElementById('preview').textContent = JSON.stringify(buildArray(),null,2);
@@ -610,8 +1684,12 @@ function render(){
 // 经纬度不再限制取值范围（任意数值均可发布，越界只做提醒，由 EQuake 自行解析）
 function validate(arr){
   const errs = [];
+  const seen = {};   // eventID#reportNum → 首次出现的序号：重复会让 EQuake 忽略后发的那一条
   arr.forEach((d,i)=>{
     const n = i+1;
+    const key = d.eventID + '#' + d.reportNum;
+    if(seen[key] !== undefined) errs.push('第'+n+'报 与第'+(seen[key]+1)+'报 的 eventID('+d.eventID+') 和报数('+d.reportNum+') 完全相同，EQuake 会当成同一报、后发的这条会被忽略（请把报数改成递增）');
+    else seen[key] = i;
     if(!(d.depth >= 0 && d.depth <= 700)) errs.push('第'+n+'报 depth='+d.depth+' 超出 0~700 km');
     if(!(d.magnitude >= -1 && d.magnitude <= 10)) errs.push('第'+n+'报 magnitude='+d.magnitude+' 超出 -1~10');
     if(!d.shockTime) errs.push('第'+n+'报 shockTime 为空，EQuake 无法定位震中');
@@ -623,7 +1701,14 @@ function validate(arr){
   return errs;
 }
 // 统一投递入口：errs 非空则不发, 否则 POST 到服务器（useDelay=false 时立即发出）
+let fixNote = '';   // 发布前的「报数撞号已顺延」提示，跟发布结果一起显示
 async function sendPlan(arr, useDelay, tag){
+  const nFix = fixDupNums(arr);
+  if(nFix){
+    renum(); render();
+    fixNote = '发布前已把 '+nFix+' 张撞号的报顺延成不重复的报数（原报数重复，EQuake 只会认前几条）';
+  }
+  arr.forEach(d=>{ delete d._card; });   // DOM 引用不能进 JSON
   const errs = validate(arr);
   if(errs.length){ msg((tag||'发布')+'已取消：'+errs.join('；'), false); return false; }
   const warns = staleWarn(arr);
@@ -632,20 +1717,49 @@ async function sendPlan(arr, useDelay, tag){
     const j = await postJson('/publish', JSON.stringify(arr), useDelay ? '' : '?immediate=1');
     if(j.ok){
       const sc = (j.schedule || []).map(s => '第' + s.i + '报' + (s.delaySec > 0 ? (' ' + s.delaySec + ' 秒后') : '立即')).join('、');
-      msg((tag||'发布')+'已排入 ' + j.count + ' 报：' + sc + '，EQuake 每秒轮询取走。', true);
+      msg((tag||'发布')+'已排入 ' + j.count + ' 报：' + sc + '，EQuake 每秒轮询取走。' + (fixNote ? ('（'+fixNote+'）') : ''), true);
+      fixNote = '';
       if(warns.length) msg(warns.join('；'), true);
       if(useDelay) startPlan();
       return true;
     }
-    msg((tag||'发布')+'失败：'+j.error,false);
+    msg((tag||'发布')+'失败：'+j.error+(fixNote?('（'+fixNote+'）'):''),false);
     return false;
   }catch(e){ msg((tag||'发布')+'失败：'+(e.message||e),false); return false; }
+  finally{ fixNote = ''; }
 }
-async function publish(){
-  const arr = buildArray();
-  if(!arr.length){ msg('没有启用中的报文，先添加并启用至少一报。',false); return; }
+async function publish(tag, box){
+  const arr = buildArray(box);
+  if(!arr.length){ msg((tag||'发布')+'没有启用中的报文：先添加并启用至少一报。',false); return; }
+  const nFix = fixDupNums(arr);   // 发布前先把撞号的报数理顺，并同步预览
+  if(nFix){
+    renum(); render();
+    // 存下来，跟「已排入 N 报」合成一条提示（单独弹一条会立刻被发布结果覆盖掉）
+    fixNote = '发布前已把 '+nFix+' 张撞号的报顺延成不重复的报数（原报数重复，EQuake 只会认前几条）';
+  }
   const useDelay = !!document.getElementById('useDelay').checked;
-  if(await sendPlan(arr, useDelay, '发布')) { refreshSent(); }
+  if(await sendPlan(arr, useDelay, tag || '发布')) { refreshSent(); bumpTab(); }
+}
+// 分页标签上的「📤 发布」：直接发这一分页的报文（点了别的分页先切过去再发，省一步手动切页）
+async function pubTab(i){
+  if(i < 0 || i >= TABS.length) return;
+  const t = TABS[i];
+  const cnt = tabCount(t);
+  if(!cnt.all){
+    msg('分页「'+t.name+'」（'+t.eid+'）里还没有任何报文：先加一报，或用「🎲 生成多报序列 / 🎯 历史地震预设」造几报。', false);
+    return;
+  }
+  if(!cnt.en){
+    msg('分页「'+t.name+'」（'+t.eid+'）里有 '+cnt.all+' 张卡片，但一张都没勾「启用」，发布会发空——先把要发的几报勾上启用。', false);
+    return;
+  }
+  const n = cnt.en;
+  if(i !== CUR){
+    switchTab(i);
+    msg('已切到分页「'+t.name+'」并发送它的 '+n+' 报。', true);
+  }
+  // 显式按这一分页的容器取报文（不依赖 #cards 当前指向谁），保证点哪页发哪页
+  await publish('发布[' + t.name + ']', t.box);
 }
 
 // ---------- 本次已发出事件：继续加报 / 直接取消 ----------
@@ -656,7 +1770,7 @@ async function refreshSent(){
   const box = document.getElementById('sentList');
   if(!box) return;
   if(!API){
-    box.innerHTML = '<div class="senterr">还没连上发报服务器（正在自动探测…）。确认 <code>启动服务器.bat</code> 在运行，连上后这里会自动列出已发出的地震。</div>';
+    box.innerHTML = '<div class="senterr">还没连上发报服务器（正在自动探测…）。确认 <code>startserver.bat</code> 在运行，连上后这里会自动列出已发出的地震。</div>';
     return;
   }
   let s = null;
@@ -666,13 +1780,13 @@ async function refreshSent(){
     s = await resp.json();
   }catch(e){
     box.innerHTML = '<div class="senterr">读不到已发记录（' + esc(String(e && e.message || e)) +
-      '）：请确认 <code>启动服务器.bat</code> 正在运行，且服务器是重启后的新版本。</div>';
+      '）：请确认 <code>startserver.bat</code> 正在运行，且服务器是重启后的新版本。</div>';
     return;
   }
   // 旧版服务器 /sent 会走数据兜底返回 []，不是 {ok,items} —— 这时面板没法用，明确提示重启服务器
   if(!s || !Array.isArray(s.items)){
     box.innerHTML = '<div class="senterr">服务器版本过旧，不支持「已发事件」查询（/sent 返回 ' +
-      JSON.stringify(s).slice(0, 80) + '）。请关闭旧窗口、双击 <code>启动服务器.bat</code> 重启后再刷新本页。</div>';
+      JSON.stringify(s).slice(0, 80) + '）。请关闭旧窗口、双击 <code>startserver.bat</code> 重启后再刷新本页。</div>';
     return;
   }
   SENT_ITEMS = s.items || [];
@@ -686,6 +1800,7 @@ async function refreshSent(){
 }
 function kindTag(d){
   if(d.isCancel) return '<span class="tag cancel">取消报</span>';
+  if(d.official) return '<span class="tag official">正式报</span>';
   if(d.isFinal) return '<span class="tag final">最终报告</span>';
   if(d.isPLUM) return '<span class="tag plum">PLUM</span>';
   if(d.isCSIS) return '<span class="tag eew">EEW 速报</span>';
@@ -695,19 +1810,27 @@ function renderSent(){
   const box = document.getElementById('sentList');
   if(!box) return;
   const cnt = document.getElementById('sentCount');
-  if(!SENT_ITEMS.length){
-    if(cnt) cnt.textContent = '（共 0 次地震 / 0 条报文）';
-    box.innerHTML = '<div class="senterr">还没有发布过任何报文：内容填好后点「📤 发布到服务器」，这里就会列出每一次地震，可继续加报或一键取消。</div>';
+  // 「只看当前分页」：只列这个地震（eventID）的报文，方便几场地震分着看
+  const flt = document.getElementById('sentOnlyTab');
+  const ct = curTab();
+  const onlyId = (flt && flt.checked && ct && ct.eid) ? ct.eid : '';
+  const SENT = onlyId ? SENT_ITEMS.filter(d => d.eventID === onlyId) : SENT_ITEMS;
+  if(!SENT.length){
+    if(cnt) cnt.textContent = onlyId ? '（当前分页「' + (ct ? ct.name : '') + '」还没有已发记录）' : '（共 0 次地震 / 0 条报文）';
+    box.innerHTML = '<div class="senterr">' + (onlyId
+      ? '这个分页还没发布过报文（切到别的分页或取消「只看当前分页」可看全部）。'
+      : '还没有发布过任何报文：内容填好后点「📤 发布到服务器」，这里就会列出每一次地震，可继续加报或一键取消。') + '</div>';
     return;
   }
   const groups = {}, order = [];
-  SENT_ITEMS.forEach(d=>{
+  SENT.forEach(d=>{
     if(!groups[d.eventID]){ groups[d.eventID] = []; order.push(d.eventID); }
     groups[d.eventID].push(d);
   });
-  const totalReports = SENT_ITEMS.length;
-  if(cnt) cnt.textContent = '（共 ' + order.length + ' 次地震 / ' + totalReports + ' 条报文 · 序号 1=最旧，数字越大越新）';
-  const rtag = d => d.isCancel ? '取消' : d.isFinal ? '最终' : d.isPLUM ? 'PLUM' : d.isCSIS ? '速报' : '普通';
+  const totalReports = SENT.length;
+  if(cnt) cnt.textContent = '（' + (onlyId ? '当前分页' : '全部') + ' ' + order.length + ' 次地震 / ' + totalReports + ' 条报文 · 序号 1=最旧，数字越大越新）' +
+    (onlyId ? ' <button class="mini" onclick="document.getElementById(\'sentOnlyTab\').checked=false;renderSent()">看全部</button>' : '');
+  const rtag = d => d.isCancel ? '取消' : d.official ? '正式' : d.isFinal ? '最终' : d.isPLUM ? 'PLUM' : d.isCSIS ? '速报' : '普通';
   box.innerHTML = order.map((ev, i) => {
     const list = groups[ev];               // 已是最新在前
     const seq = order.length - i;          // 序号：最旧=1，依次递增，最新=order.length
@@ -764,6 +1887,7 @@ function openMore(ev){
     '<div class="maphead"><b>📍 在弹窗内地图选点</b> ' +
     '<select id="moreBaseSel"><option value="amap">高德矢量</option><option value="amapsat">高德卫星</option><option value="osm">OpenStreetMap</option></select> ' +
     '<span class="hint">点地图或拖动标记设置震中，坐标自动写回下方卡片</span></div>' +
+    '<div class="place-search"><input type="text" id="moreSearch" placeholder="🔍 搜索地点（如：东京 / osaka / 福島）" oninput="placeSearch(this.value,\'more\')" onkeydown="if(event.key===\'Escape\'){this.value=\'\';placeSearch(\'\',\'more\')}"><div class="place-results" id="moreResults"></div></div>' +
     '<div id="moreMap"></div>');
   const c = addCard(body);
   moreCard = c;
@@ -782,8 +1906,18 @@ function openMore(ev){
   });
   c.querySelector('.f-rest').checked = false; // 加报默认「继着上一次地震波」，不重置；要重发请在卡片里勾「波从震中重新发出」或填「震波已发出」秒数
   c.querySelector('.f-wave').value = '';      // 留空 = 继续上一次波
+  // 「始终同步」开着时：加报的发布时刻是「现在」，发震时刻跟着对齐（= 波从震中刚出发），
+  // 想让波继着上一次继续跑，点卡片上发震时刻右边的「🔗 同步」切成「⛓ 分开」就行
+  if(syncOn()){
+    const _rt = c.querySelector('.f-rt'), _st = c.querySelector('.f-st');
+    if(_rt && _st) _st.value = _rt.value;
+    c.querySelector('.f-rest').checked = true;
+  }
+  paintSyncBtn(c);
+  if(c._upd) c._upd();
   // eventID 锁定为本次地震编号：去掉「换一个」按钮，并把输入框置灰只读
-  c.querySelectorAll('button').forEach(b=>{ if(/reid\(/.test(b.getAttribute('onclick') || '')) b.remove(); });
+  // 弹窗自带地图，所以去掉卡片里的「换一个」与「📍 地图选点」按钮（后者会再开一层地图，没必要）
+  c.querySelectorAll('button').forEach(b=>{ const oc = b.getAttribute('onclick') || ''; if(/reid\(|openPick\(/.test(oc)) b.remove(); });
   const idEl = c.querySelector('.f-id');
   idEl.value = ev;
   idEl.readOnly = true;
@@ -808,6 +1942,7 @@ function openMore(ev){
       '每报间隔 <input type="number" id="srG" value="4" min="0" max="600"> 秒 ' +
       '<select id="srGMode"><option value="exact">精确</option><option value="approx" selected>大约</option></select> ' +
       '<button class="mini" onclick="genSeries()">生成到下方卡片区</button>' +
+      
       '<span class="hint">先在上面把<b>最终数值</b>设好（震级/震中/深度/震度/类型），再点这里：' +
       '程序会按报数生成一串由弱到强、数值来回飘的报，震中逐步收敛，<b>末报与你设定的最终数值完全一致</b>；' +
       '生成后可再逐张微调，确认后点「📤 发布到服务器」。</span>' +
@@ -819,6 +1954,12 @@ function openMore(ev){
     '<button onclick="closeMore()">取消</button>' +
     '<button class="primary" onclick="sendMore()">📤 发出这一报</button>';
   document.getElementById('moreEv').textContent = '本次地震编号 ' + ev + ' · 将作为第 ' + nextNum + ' 报';
+  // 弹窗里的「发震时刻同步」与主面板那个勾保持一致（改一处另一处跟着变）
+  const syEl = document.getElementById('srSync'), syMs = document.getElementById('msSync');
+  if(syEl){
+    if(syMs) syEl.checked = syMs.checked;
+    syEl.addEventListener('change', ()=>{ if(syMs) syMs.checked = syEl.checked; });
+  }
   document.getElementById('moreModal').classList.add('on');
   render();
   initMoreMap();
@@ -838,6 +1979,67 @@ async function sendMore(){
     refreshSent();
   }
 }
+// ---------- 使用说明书弹窗 ----------
+const HELP_TABS = [
+  ['🚀 快速上手', 0], ['🧰 顶栏与工具栏', 1], ['📄 报文卡怎么填', 2],
+  ['🎲 多报与预设', 3], ['📂 分页与存档', 4], ['🔌 EQuake 接线', 5],
+  ['📐 规则速查', 6], ['📋 正式报 / P/S 波', 7], ['❓ 常见问题', 8]
+];
+let helpSec = 0, helpBuilt = false;
+function buildHelpTabs(){
+  if(helpBuilt) return;
+  const host = document.getElementById('helpTabs');
+  if(!host) return;
+  host.innerHTML = HELP_TABS.map(function(t, i){
+    return '<button class="ht" data-i="' + i + '" onclick="helpGo(' + i + ')">' + t[0] + '</button>';
+  }).join('');
+  helpBuilt = true;
+}
+function paintHelp(){
+  buildHelpTabs();
+  const btns = document.querySelectorAll('#helpTabs .ht');
+  btns.forEach(function(b, i){ b.classList.toggle('on', i === helpSec); });
+  const secs = document.querySelectorAll('#helpModal .help-sec');
+  secs.forEach(function(s){ s.classList.toggle('on', parseInt(s.getAttribute('data-sec'), 10) === helpSec); });
+  const p = document.getElementById('helpPos');
+  if(p) p.textContent = '第 ' + (helpSec + 1) + ' / ' + HELP_TABS.length + ' 段　' + HELP_TABS[helpSec][0];
+}
+// 相对移动一段（标题栏/底栏的「← 上一段」「下一段 →」用这个；章节按钮用下面的 helpGo 绝对跳）
+function helpStep(d){
+  helpGo(helpSec + (d || 0));
+}
+function helpGo(i, quiet){
+  const n = HELP_TABS.length;
+  helpSec = ((i % n) + n) % n;
+  paintHelp();
+  try{ localStorage.setItem('eqsender.help.sec', String(helpSec)); }catch(e){}
+  if(!quiet){
+    const box = document.querySelector('#helpModal .modal-box');
+    if(box && box.scrollIntoView) box.scrollIntoView({ block: 'start' });
+    const wrap = document.getElementById('helpModal');
+    if(wrap) wrap.scrollTop = 0;
+  }
+}
+function openHelp(sec){
+  const m = document.getElementById('helpModal');
+  if(!m) return;
+  let s = (sec == null ? helpSec : sec);
+  if(sec == null){
+    try{
+      const v = parseInt(localStorage.getItem('eqsender.help.sec'), 10);
+      if(isFinite(v) && v >= 0 && v < HELP_TABS.length) s = v;   // 记忆上次读到第几段
+    }catch(e){}
+  }
+  helpGo(s, true);
+  m.classList.add('on');
+}
+function closeHelp(){
+  const m = document.getElementById('helpModal');
+  if(m) m.classList.remove('on');
+}
+function helpBackdrop(ev){
+  if(ev && ev.target === ev.currentTarget) closeHelp();   // 只点空白遮罩才关，点在框里不关
+}
 // 免责声明弹窗：HTML 里默认带 class="on"，每次进入页面都会先弹出来，点确认才关闭（不做记忆，每次都弹）
 function closeDisc(){
   const el = document.getElementById('discModal');
@@ -852,12 +2054,6 @@ function closeMore(){
   moreCard = null;
 }
 // ---------- 多报序列：用户定最终值 → 由弱到强、带随机浮动、末报精确收敛 ----------
-// 时间戳 -> UTC+9 时间串（与 nowJST 同一口径）
-function msToJST(ms){
-  const d = new Date(ms + (9*60 + new Date(ms).getTimezoneOffset())*60000);
-  const p = n => String(n).padStart(2,'0');
-  return d.getFullYear()+'/'+p(d.getMonth()+1)+'/'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes())+':'+p(d.getSeconds());
-}
 // fin = 用户设定的最终数值；opt = {n 报数, nApprox 大约?, gap 每报间隔秒, gapApprox 大约?, rest 是否 reStamp}
 // 首报比最终低几级、随机浮动幅度由程序按报数自动给出，用户不再手填
 function makeSeries(fin, opt){
@@ -866,8 +2062,11 @@ function makeSeries(fin, opt){
     ? Math.max(2, Math.min(99, Math.round(wantN * (0.7 + 0.6 * Math.random()))))  // 大约：在填的数附近浮动
     : wantN;
   const gapBase = Math.max(0, parseFloat(opt.gap) || 0);
-  const dMag = opt.nApprox ? (0.8 + 0.7 * Math.random()) : 1.0;    // 首报比最终偏弱
-  const upAllow = opt.nApprox ? (0.5 + 0.6 * Math.random()) : 0.6;  // 允许中间报比最终值还大（冲高再回落）
+  // 「本项目算法算」震度时首报要压得更低：M>=7 的地震震中最大震度本来就都顶到 7，
+  // 不拉开震级包络的话中间报跟末报算出来一样是 7，序列就看不出「由弱到强」了
+  const isCalc = (opt.iMode === 'calc');
+  const dMag = isCalc ? 2.0 : (opt.nApprox ? (0.8 + 0.7 * Math.random()) : 1.0);    // 首报比最终偏弱
+  const upAllow = isCalc ? 0.4 : (opt.nApprox ? (0.5 + 0.6 * Math.random()) : 0.6);  // 允许中间报比最终值还大（冲高再回落）
   const jit  = opt.nApprox ? (0.14 + 0.10 * Math.random()) : 0.16;  // 飘忽幅度，始终非零
   const magLow = Math.max(-1, Math.min(10, fin.magnitude - dMag));
   const magHi  = Math.min(10, fin.magnitude + upAllow); // 上探包络：可超过用户填的最终值
@@ -894,29 +2093,68 @@ function makeSeries(fin, opt){
   for(let k = 1; k <= N; k++){
     const f = k / N, last = (k === N);
     const mg = Math.max(magLow, Math.min(10, mags[k - 1]));
+    // 震度来源：calc=本项目算法按这一报自己的震级深度算；blank=置空交给 EQuake（isCSIS 自动勾上）；
+    // none=直接填「不明」；auto=旧的「由最终值往回递减」；这些模式下末报也一并按模式走，只有 auto 保留用户填的最终值
     let imi = fin.maxIntensity, lgi = fin.maxLgInt;
-    if(!last && iEnd > 0) imi = selI[Math.max(0, iEnd - (N - k) - (Math.random() < 0.25 ? 1 : 0))];
-    if(!last && lEnd > 0) lgi = selL[Math.max(0, lEnd - Math.round((N - k) * 0.6) - (Math.random() < 0.25 ? 1 : 0))];
+    const im = opt.iMode || 'auto';
+    if(im === 'calc'){
+      // 末报保留用户/预设选定的那组震度（历史实况值等），只有中间报按本算法随震级递增
+      const ci = calcIntensity(mg, fin.depth);
+      imi = last ? fin.maxIntensity : ci.imi;
+      lgi = last ? fin.maxLgInt : ci.lgi;
+    } else if(im === 'blank'){
+      imi = ''; lgi = '';
+    } else if(im === 'none'){
+      imi = '不明'; lgi = '不明';
+    } else {
+      if(!last && iEnd > 0) imi = selI[Math.max(0, iEnd - (N - k) - (Math.random() < 0.25 ? 1 : 0))];
+      if(!last && lEnd > 0) lgi = selL[Math.max(0, lEnd - Math.round((N - k) * 0.6) - (Math.random() < 0.25 ? 1 : 0))];
+    }
+    // 最终报告（最后一报且 isFinal）尊重用户对 isCSIS 的选择，不强制勾上；其余报震度置空仍须 isCSIS=true
+    const csisK = fin.isCSIS || ((imi === '' || lgi === '') && !(last && fin.isFinal));
     const off = 0.9 * Math.pow(1 - f, 1.2);
     const dt = (k === 1) ? 0 : (opt.gapApprox ? Math.max(0, gapBase * (0.6 + 0.9 * Math.random())) : gapBase); // 大约：间隔也飘忽
     acc += dt;
+    // 同步（默认）：这一报的发震时刻 = 这一报自己的发布时刻，等价于「波从震中刚发出」，
+    // 所以同时按重新发出处理、清掉「已发出秒数」，免得前后矛盾（既说刚发震又说波已跑了一段）
+    const rtStr = msToJST(t0 + acc * 1000);
+    const sy = !!opt.sync;
+    // 波程（每报地震波起点）：sync 恒为每报从震中重发；否则按 opt.wave 决定
+    //  stable（默认）= 首报按 rest/waveElapsed 锚定，后续报继着上一次波单调向外扩（不重置）
+    //  reeach        = 每报都从震中重新发出（归零重扩，不累积）
+    //  jump          = 后续报随机：约 40% 从震中重发，其余带上随机「震波已发出秒数」让起点忽近忽远（变来变去）
+    const wv = opt.wave || 'stable';
+    let reStamp, waveElapsed;
+    if(sy || wv === 'reeach'){
+      reStamp = true; waveElapsed = null;
+    } else if(wv === 'jump'){
+      if(k === 1){ reStamp = !!opt.rest; waveElapsed = fin.waveElapsed; }
+      else {
+        const wmax = Math.max(25, (gapBase || 4) * N * 1.2); // 波程上限(秒)，约 7km/s
+        if(Math.random() < 0.4){ reStamp = true; waveElapsed = null; }
+        else { reStamp = false; waveElapsed = +(Math.random() * wmax).toFixed(1); }
+      }
+    } else {
+      reStamp = (k === 1) ? !!opt.rest : false;
+      waveElapsed = (k === 1) ? fin.waveElapsed : null;
+    }
     out.push({
       eventID: fin.eventID, placeName: fin.placeName, sourceName: fin.sourceName,
       latitude:  last ? fin.latitude  : +(fin.latitude  + rnd(off)).toFixed(2),
       longitude: last ? fin.longitude : +(fin.longitude + rnd(off)).toFixed(2),
       depth: last ? fin.depth : Math.max(1, Math.round(fin.depth + rnd(12 * Math.pow(1-f, 1.2)))),
       magnitude: +mg.toFixed(1),
-      reportTime: msToJST(t0 + acc * 1000),
-      shockTime: fin.shockTime,
+      reportTime: rtStr,
+      shockTime: sy ? rtStr : fin.shockTime,
       reportNum: (parseInt(fin.reportNum, 10) || 1) + (k - 1),
-      maxIntensity: fin.isCSIS ? '' : imi,
-      maxLgInt: fin.isCSIS ? '' : lgi,
-      isCSIS: fin.isCSIS, isPLUM: fin.isPLUM,
+      maxIntensity: csisK ? '' : imi,
+      maxLgInt: csisK ? '' : lgi,
+      isCSIS: csisK, isPLUM: fin.isPLUM,
       isFinal: last ? fin.isFinal : false,
       isCancel: false,
       delaySec: dt,
-      reStamp: (k === 1) ? !!opt.rest : false, // 仅首报按「重新发出」锚定；后续报继着上一次波，波持续向外扩不重置
-      waveElapsed: (k === 1) ? fin.waveElapsed : null
+      reStamp: reStamp,
+      waveElapsed: waveElapsed
     });
   }
   return out;
@@ -929,10 +2167,13 @@ function genSeries(){
     nApprox: document.getElementById('srNMode').value === 'approx',
     gap: document.getElementById('srG').value,
     gapApprox: document.getElementById('srGMode').value === 'approx',
-    rest: moreCard.querySelector('.f-rest').checked
+    rest: moreCard.querySelector('.f-rest').checked,
+    iMode: document.getElementById('msIMode').value,
+    wave: document.getElementById('msWave').value,
+    sync: syncSeriesOpt()
   };
   const series = makeSeries(fin, opt);
-  const host = document.getElementById('cards');
+  const host = curBox();
   if(host.children.length && !confirm('主页面上已有 ' + host.children.length + ' 张卡片，生成多报会先清空它们，继续？')) return;
   host.innerHTML = '';
   series.forEach(d => {
@@ -946,11 +2187,13 @@ function genSeries(){
   const f1 = series[0], fN = series[series.length - 1];
   msg('已按「' + fin.eventID + '」生成 ' + series.length + ' 报：第 ' + f1.reportNum + ' 报 M' + f1.magnitude.toFixed(1) +
       ' → 第 ' + fN.reportNum + ' 报 M' + fN.magnitude.toFixed(1) + '（末报 = 你设定的最终数值，每报间隔 ' +
-      (parseFloat(opt.gap) || 0) + ' 秒）。检查无误后点「📤 发布到服务器」。', true);
+      (parseFloat(opt.gap) || 0) + ' 秒）。' +
+      (opt.wave === 'reeach' ? ' 每报的地震波从震中重发。' : opt.wave === 'jump' ? ' 每报的地震波起点随机跳动（变来变去）。' : ' 波继着上一次继续向外扩。') +
+      '检查无误后点「📤 发布到服务器」。', true);
 }
 // 主页面独立入口：取卡片区第一张作为「最终报」模板，生成由弱到强、数值来回飘的多报序列
 function genSeriesMain(){
-  const host = document.getElementById('cards');
+  const host = curBox();
   const cards = Array.from(host.querySelectorAll('.card'));
   if(!cards.length){
     msg('先在上方卡片区「＋ 添加一报」并填好最终报（震级/震中/深度/震度/类型设成最终想要的、勾好「波从震中重新发出」），再点生成多报序列。', false);
@@ -964,20 +2207,844 @@ function genSeriesMain(){
     nApprox: document.getElementById('msNMode').value === 'approx',
     gap: document.getElementById('msG').value,
     gapApprox: document.getElementById('msGMode').value === 'approx',
-    rest: restEl ? restEl.checked : true
+    rest: restEl ? restEl.checked : true,
+    iMode: document.getElementById('msIMode').value,
+    wave: document.getElementById('msWave').value,
+    sync: syncSeriesOpt()
   };
+  // 自定义 eventID / 信息源：填了就整条序列统一用它，留空则沿用最终报那一套
+  const eidEl = document.getElementById('msEid');
+  const srcEl = document.getElementById('msSrc');
+  const eid = eidEl ? eidEl.value.trim() : '';
+  const src = srcEl ? srcEl.value.trim() : '';
+  if(eid) fin.eventID = eid;
+  if(src) fin.sourceName = src;
   const series = makeSeries(fin, opt);
+  if(eid || src) series.forEach(d => {
+    if(eid) d.eventID = eid;
+    if(src) d.sourceName = src;
+  });
   host.innerHTML = '';
   series.forEach(d => {
     const c = addCard();
     fillCard(c, d);
     c.querySelector('.f-rest').checked = !!d.reStamp;
     c.querySelector('.f-en').checked = true;
+    if(eid) c.querySelector('.f-id').value = eid;
+    if(src) c.querySelector('.f-src').value = src;
+  });
+  renum(); render(); bumpTab();
+  const f1 = series[0], fN = series[series.length - 1];
+  msg('已在「' + (curTab() ? curTab().name : '当前分页') + '」生成 ' + series.length + ' 报（eventID ' + fN.eventID + '・信息源 ' + (fN.sourceName || 'JMA') +
+      '）：第 ' + f1.reportNum + ' 报 M' + f1.magnitude.toFixed(1) +
+      ' → 第 ' + fN.reportNum + ' 报 M' + fN.magnitude.toFixed(1) + '（末报 = 你设定的最终数值）。' +
+      (opt.wave === 'reeach' ? '每报的地震波都从震中重新发出（不累积）。'
+       : opt.wave === 'jump' ? '每报的地震波起点随机跳动（忽近忽远，变来变去）。'
+       : (opt.sync ? '发震时刻已逐报同步到各报自己的发布时刻，波都从震中刚出发。' : '整条序列共用一个发震时刻 ' + fN.shockTime + '，波继着上一次继续向外扩。')) +
+      '可逐张微调后点「📤 发布到服务器」。', true);
+}
+// 把卡片区第一张（最终报）的 eventID / 信息源填进多报面板那两个输入框
+function syncMsID(){
+  const host = curBox();
+  const c = host.querySelector('.card');
+  if(c){
+    const idEl = c.querySelector('.f-id'), srcEl = c.querySelector('.f-src');
+    if(idEl) document.getElementById('msEid').value = idEl.value.trim();
+    if(srcEl) document.getElementById('msSrc').value = srcEl.value.trim();
+  }
+  msg('已把最终报的 eventID / 信息源同步到多报面板，可再改。', true);
+}
+// ---------- 地震分页（一次发报台可以同时备好几场"地震"，各页独立的卡片与 eventID） ----------
+// TABS[i] = {key,name,eid,src,box,pv}；pv 里存该页在「生成多报序列」面板上的参数，切页时回填
+let TABS = [];
+let CUR = 0;
+function curTab(){ return TABS[CUR] || null; }
+// 同一毫秒里连开几个分页 / 连点「换一个」也不能撞号，所以尾上挂一段随机
+function randEid(){ return 'EQ_' + Date.now() + '_' + Math.floor(Math.random() * 1e5).toString(36); }
+function initTabs(){
+  const stat = document.getElementById('cards');
+  stat.className = 'tabbox';
+  stat.id = 'tabbox_0';
+  TABS.push({ key:0, name:'地震 1', eid:randEid(), src:'JMA', box:stat, pv:{}});
+  savePv(0);          // 先把面板上的默认参数存档成这一页的设定，切回来才不会串成上一页的值
+  switchTab(0, true);
+}
+function renderTabBar(){
+  const bar = document.getElementById('eqTabs');
+  if(!bar) return;
+  let h = TABS.map((t,i)=>
+    '<div class="tab'+(i===CUR?' on':'')+'" onclick="switchTab('+i+')" title="'+esc(t.name)+' · '+esc(t.eid)+'（双击改名）">' +
+      '<span class="tn" ondblclick="renameTab('+i+')" title="'+esc(t.name)+' · '+esc(t.eid)+'（双击改名）">'+esc(t.name)+'</span>' +
+      '<button class="pub" onclick="event.stopPropagation();pubTab('+i+')" title="直接发布「'+esc(t.name)+'」（'+esc(t.eid)+'）里的全部报文，不用先切过来">📤 发布</button>' +
+      '<span class="hint">'+TABS[i].box.querySelectorAll('.card').length+' 报</span>' +
+      (TABS.length>1 ? '<button class="x" onclick="event.stopPropagation();delTab('+i+')" title="删除这个分页">✕</button>' : '') +
+    '</div>'
+  ).join('');
+  h += '<button class="add" onclick="newTab()" title="新开一场地震（自动分配新的 eventID）">＋ 新建地震分页</button>';
+  h += '<span class="sp"></span><span class="hint">每个分页各自独立：卡片、eventID / 信息源、多报参数都是分开的；双击分页名可改名。所有改动会自动存进本地存档；要看/载回/改名/删除存档里的某一页，或导入导出整份工作区，点工具栏的「📂 工作区」。</span>';
+  bar.innerHTML = h;
+}
+function savePv(i){
+  const t = TABS[i]; if(!t) return;
+  const g = id => { const e = document.getElementById(id); return e ? e.value : ''; };
+  t.pv = { n:g('msN'), nm:g('msNMode')||'approx', g:g('msG'), gm:g('msGMode')||'approx',
+           im:g('msIMode'), wv:g('msWave'), eid:g('msEid'), src:g('msSrc'),
+           sy:(document.getElementById('msSync') ? !!document.getElementById('msSync').checked : true) };
+}
+function loadPv(t){
+  const pv = t.pv || {};
+  const s = (id,v) => { const e = document.getElementById(id); if(e && v !== undefined && v !== '') e.value = v; };
+  s('msN',pv.n); s('msNMode',pv.nm); s('msG',pv.g); s('msGMode',pv.gm); s('msIMode',pv.im); s('msWave',pv.wv);
+  const syEl = document.getElementById('msSync');
+  if(syEl && pv.sy !== undefined) syEl.checked = !!pv.sy;   // 「发震时刻同步」按分页各自记住
+  // eventID / 信息源必须显式带过来：显示分页自己的编号（否则切页时面板会残留上一页的值，再被存进新页造成串号）
+  const e = document.getElementById('msEid'), k = document.getElementById('msSrc');
+  // 分页自己的编号优先（否则切页时会被上一页面板里的残留值顶掉，几页之间串号）
+  if(e){ e.value = (t.eid || pv.eid || ''); t.eid = e.value; }
+  if(k){ k.value = (t.src || pv.src || 'JMA'); t.src = k.value; }
+}
+function switchTab(i, silent){
+  if(i < 0 || i >= TABS.length) return;
+  savePv(CUR);
+  CUR = i;
+  const t = TABS[i];
+  // #cards 永远只挂在当前分页这一个容器上：先把所有别的分页的 id 摘掉，再给当前页挂上
+  // （之前用「只清 id==='cards' 的」写法，切页时会出现两个容器同时叫 cards，按 id 取数就会串页）
+  document.querySelectorAll('.tabbox').forEach(b => { if(b !== t.box) b.removeAttribute('id'); });
+  // 兜底：页面里那个静态 <div id="cards"> 若还挂着 id（存档恢复路径），也一并摘掉
+  const stale = document.getElementById('cards');
+  if(stale && stale !== t.box) stale.removeAttribute('id');
+  if(t.box) t.box.id = 'cards';
+  loadPv(t);
+  renderTabBar(); updateMsCur(); renum(); render(); renderSent();
+  if(!silent) msg('已切到「' + t.name + '」（eventID ' + esc(t.eid) + '，' + t.box.querySelectorAll('.card').length + ' 报）。', true);
+}
+function newTab(){
+  const i = TABS.length;
+  const box = document.createElement('div');
+  box.className = 'tabbox'; box.id = 'tabbox_' + i;
+  document.getElementById('tabPages').appendChild(box);
+  TABS.push({ key:i, name:'地震 ' + (i + 1), eid:randEid(), src:'JMA', box, pv:{} });
+  switchTab(i);
+  msg('已新建分页「地震 ' + (i + 1) + '」，并自动给它分配了新 eventID ' + TABS[i].eid +
+      '（原来的分页不受影响）。这个分页现在是空的，可在下方卡片区「＋ 添加一报」或「🎲 生成多报序列」直接入库。', true);
+}
+function delTab(i){
+  if(TABS.length <= 1){ msg('至少要留一个地震分页。', false); return; }
+  if(!confirm('删除分页「' + TABS[i].name + '」？它里面还没发布的卡片会一起删掉（已发布到服务器的报文不受影响）。')) return;
+  const t = TABS[i];
+  if(t.box && t.box.parentElement) t.box.parentElement.removeChild(t.box);
+  TABS.splice(i, 1);
+  TABS.forEach((x,k)=>{ x.key = k; });
+  if(CUR >= TABS.length) CUR = TABS.length - 1;
+  switchTab(Math.min(CUR, TABS.length - 1), true);
+  renderTabBar();
+  msg('已删除分页（还剩 ' + TABS.length + ' 个）。', true);
+}
+function renameTab(i){
+  const t = TABS[i]; if(!t) return;
+  const nv = prompt('给这个地震分页起个名（会跟着这个 eventID 一起显示在分页栏上）：', t.name);
+  if(nv === null) return;
+  t.name = nv.trim() || t.name;
+  renderTabBar(); updateMsCur(); scheduleSave();   // 改名不会触发 input，手动存档
+}
+// 「生成多报序列」面板上显示当前分页
+function updateMsCur(){
+  const el = document.getElementById('msCur');
+  const t = curTab();
+  if(el) el.textContent = t ? '（当前分页：' + t.name + ' · ' + t.eid + '）' : '';
+}
+// 刷新 eventID：随机换一个新的并写回当前分页（"换一个"按钮）
+function newEid(){
+  const t = curTab();
+  const el = document.getElementById('msEid');
+  const nv = randEid();
+  if(el) el.value = nv;
+  if(t){ t.eid = nv; if(t.box){ t.box.querySelectorAll('.card .f-id').forEach(x=>{ x.value = nv; }); } }
+  renderTabBar(); updateMsCur(); render(); scheduleSave();
+  msg('已给当前分页刷新一个新 eventID：' + nv + '。同一分页里所有卡片的 eventID 也一起换掉了（同一次地震的续报保持同一个编号）。', true);
+}
+// 面板里的 eventID / 信息源改动要同步回当前分页，切页时才能带回来
+document.addEventListener('input', e=>{
+  if(e.target && (e.target.id === 'msEid' || e.target.id === 'msSrc')){
+    const t = curTab();
+    if(!t) return;
+    if(e.target.id === 'msEid') t.eid = e.target.value.trim();
+    else t.src = e.target.value.trim() || 'JMA';
+    renderTabBar(); updateMsCur();
+  }
+});
+
+// ---------- 地震分页工作区存档：整个 TABS（卡片/名称/eventID/信息源/面板参数）存 localStorage ----------
+// 卡片字段的序列化表：选择器 -> 存档键名（新增字段时在这里加一行即可）
+const CARD_FIELDS = [['.f-id','id'],['.f-src','src'],['.f-place','place'],['.f-lat','lat'],['.f-lng','lng'],
+                     ['.f-dep','dep'],['.f-mag','mag'],['.f-num','num'],['.f-rt','rt'],['.f-st','st'],
+                     ['.f-wave','wave'],['.f-imi','imi'],['.f-lgi','lgi'],['.f-delay','delay']];
+const CARD_CHKS = [['.f-csis','csis'],['.f-plum','plum'],['.f-cancel','cancel'],['.f-final','final'],
+                   ['.f-rest','rest'],['.f-en','en']];
+function dumpCard(c){
+  const d = {};
+  CARD_FIELDS.forEach(f => { const e = c.querySelector(f[0]); d[f[1]] = e ? e.value : ''; });
+  CARD_CHKS.forEach(f => { const e = c.querySelector(f[0]); d[f[1]] = !!(e && e.checked); });
+  d.official = c.dataset.official === '1';   // 「正式报」报种标记随存档保留
+  return d;
+}
+function paintOfficial(c, on){
+  if(!c) return;
+  if(on){ c.dataset.official = '1'; c.classList.add('official'); }
+  else { delete c.dataset.official; c.classList.remove('official'); }
+  const tag = c.querySelector('.officialTag');
+  if(tag) tag.classList.toggle('on', !!on);
+}
+function fillDump(c, d){
+  const q = s => c.querySelector(s);
+  CARD_FIELDS.forEach(f => { const e = q(f[0]); if(e && d[f[1]] != null) e.value = d[f[1]]; });
+  // 只覆盖存档里确实写过的勾选：老存档没存「启用」时保持卡片默认的「勾上」，
+  // 否则恢复出来一片未勾选，点发布就会被当成「一张都没启用」
+  CARD_CHKS.forEach(f => { const e = q(f[0]); if(e && d[f[1]] != null) e.checked = !!d[f[1]]; });
+  paintOfficial(c, !!d.official);   // 老存档没有此键 = 普通报，清掉标记
+  if(c._upd) c._upd();
+  updateWaveKm(c);
+}
+let saveTimer = null;
+function scheduleSave(){ clearTimeout(saveTimer); saveTimer = setTimeout(saveTabs, 800); }
+function setSaveHint(txt){ const h = document.getElementById('saveHint'); if(h) h.textContent = txt || ''; }
+// 把当前所有分页 + 卡片写进 localStorage
+function saveTabs(quiet){
+  try{
+    savePv(CUR);
+    const data = { v:2, at:nowJST(), cur:CUR, tabs:TABS.map(t=>({ name:t.name, eid:t.eid, src:t.src, pv:(t.pv||{}) })) };
+    TABS.forEach((t,i)=>{ data.tabs[i].cards = Array.prototype.map.call(t.box.querySelectorAll('.card'), dumpCard); });
+    const ok = lsSet(LS_TABS, JSON.stringify(data));
+    let n = 0; TABS.forEach(t=>{ n += t.box.querySelectorAll('.card').length; });
+    setSaveHint(ok ? ('本地存档 ' + data.at + '：' + TABS.length + ' 个分页 / ' + n + ' 报') : '存档写入失败（隐私模式？只在本页面内存里）');
+    if(!quiet) msg(ok ? ('已保存工作区：' + TABS.length + ' 个地震分页、共 ' + n + ' 张卡片，存进浏览器本地存档。下次打开自动恢复。') : '本地存档写入失败（浏览器禁用了 localStorage，刷新后这些就没了）。', ok);
+    return ok;
+  }catch(e){
+    setSaveHint('存档失败：' + e.message);
+    if(!quiet) msg('保存工作区失败：' + e.message, false);
+    return false;
+  }
+}
+// 从本地存档恢复分页（成功返回 true，这时调用方就不再走 initTabs 建空白页）
+function restoreTabs(){
+  const raw = lsGet(LS_TABS);
+  if(!raw) return false;
+  let data;
+  try{ data = JSON.parse(raw); }catch(e){ return false; }
+  if(!data || !Array.isArray(data.tabs) || !data.tabs.length) return false;
+  const pages = document.getElementById('tabPages');
+  if(pages) pages.innerHTML = '';
+  // 页面里还有个静态的 <div id="cards">（正常走 initTabs 时它被收编成分页容器），
+  // 存档恢复会新建自己的容器，必须把那个残留的 id 摘掉，否则会出现两个 id=cards。
+  const oldCards = document.getElementById('cards');
+  if(oldCards) oldCards.removeAttribute('id');
+  TABS = []; CUR = 0;
+  data.tabs.forEach((td, i)=>{
+    const box = document.createElement('div');
+    box.className = 'tabbox';
+    box.id = 'tabbox_' + i;
+    if(pages) pages.appendChild(box);
+    TABS.push({ key:i, name: td.name || ('地震 ' + (i+1)), eid: td.eid || randEid(), src: td.src || 'JMA', box: box, pv: td.pv || {} });
+    applyArchiveCards(box, td.cards);   // 灌卡 + 「一张都没启用就全勾上」的兜底
+  });
+  const c = parseInt(data.cur, 10);
+  CUR = (isNaN(c) ? 0 : Math.min(Math.max(0, c), TABS.length - 1));
+  savePv(CUR);
+  switchTab(CUR, true);       // 内部会 loadPv + 重新编号 + 刷新预览/已发列表
+  renum();
+  const n = TABS.reduce((s,t)=>s + t.box.querySelectorAll('.card').length, 0);
+  setSaveHint('已从本地存档恢复 ' + data.at + '：' + TABS.length + ' 个分页 / ' + n + ' 报');
+  return true;
+}
+function saveWorkspace(){ saveTabs(false); }
+function clearWorkspace(){
+  if(!confirm('清除本地存档？下次打开页面会回到空白的「地震 1」，现在这些卡片会丢（无法撤销）。')) return;
+  lsDel(LS_TABS);
+  const h = document.getElementById('saveHint'); if(h) h.textContent = '';
+  msg('本地存档已清除（自定义地震预设不受影响）。', true);
+}
+
+// ---------- 工作区存档管理：看得到、载得回、改得了、导得出 ----------
+function readArchive(){
+  const raw = lsGet(LS_TABS);
+  if(!raw) return null;
+  try{ const d = JSON.parse(raw); return (d && Array.isArray(d.tabs) && d.tabs.length) ? d : null; }
+  catch(e){ return null; }
+}
+// 把存档里某一页的卡片灌进一个容器（清掉容器原有卡片）
+function applyArchiveCards(box, cards){
+  box.innerHTML = '';
+  (cards || []).forEach(d => { if(d && typeof d === 'object'){ fillDump(addCard(box), d); } });
+  // 兜底：存档里所有卡片都是「未启用」时（可能来自没存启用状态的旧存档 / 手动全取消），
+  // 恢复出来一片灰，点「📤 发布」只发那几条启用的，看着像「只能发前两报」——这里顺手全勾上
+  const all = box.querySelectorAll('.card');
+  if(!all.length) return;
+  let any = false;
+  all.forEach(c => { if(c.querySelector('.f-en').checked) any = true; });
+  if(!any){ all.forEach(c => { c.querySelector('.f-en').checked = true; }); render(); }
+}
+function openWs(){
+  const m = document.getElementById('wsModal'); if(!m) return;
+  m.classList.add('on');
+  renderWsList();
+}
+function closeWs(){
+  const m = document.getElementById('wsModal'); if(!m) return;
+  m.classList.remove('on');
+}
+function renderWsList(){
+  const el = document.getElementById('wsList'); if(!el) return;
+  const d = readArchive();
+  if(!d){
+    el.innerHTML = '<div class="hint">本地还没有存档 —— 点下面的「💾 把当前这些也存进存档」（或工具栏「💾 保存工作区」）把现在这些分页存进来，之后就能在这里随时载回去接着改。</div>';
+    return;
+  }
+  const cur = parseInt(d.cur, 10);
+  let n = 0; d.tabs.forEach(t => { n += (t.cards || []).length; });
+  let h = '<div class="hint">本地存档：' + d.tabs.length + ' 个分页 / ' + n + ' 张卡片（存于 ' + esc(d.at || '未知时间') + '）。' +
+    '「载入」会用存档里那一页<b>替换当前这一页</b>（当前页没发布的卡片会丢；存档本身不变，随时能再载回来），「复制」则是<b>新开一页</b>不碰现在这页。</div>';
+  h += d.tabs.map((t, i) =>
+      '<div class="wsrow' + (i === cur ? ' cur' : '') + '">' +
+        '<span class="wsseq">' + (i + 1) + '</span>' +
+        '<b>' + esc(t.name || ('分页 ' + (i + 1))) + '</b>' +
+        '<span class="hint">eventID ' + esc(t.eid || '—') + ' · 信息源 ' + esc(t.src || 'JMA') + ' · ' + ((t.cards || []).length) + ' 报</span>' +
+        '<span style="flex:1"></span>' +
+        '<button class="mini" onclick="wsLoad(' + i + ')">🔄 载入到当前页</button>' +
+        '<button class="mini" onclick="wsCopy(' + i + ')">📋 复制成新分页</button>' +
+        '<button class="mini" onclick="wsRename(' + i + ')">✏️ 改名</button>' +
+        '<button class="mini danger" onclick="wsDel(' + i + ')">🗑 从存档删除</button>' +
+      '</div>'
+    ).join('');
+  el.innerHTML = h;
+}
+function wsLoad(i){
+  const d = readArchive(); if(!d || !d.tabs[i]){ msg('存档里没有这一页。', false); return; }
+  const td = d.tabs[i];
+  const t = curTab();
+  if(!t){ msg('当前没有分页，先建一个。', false); return; }
+  if(!confirm('用存档里的「' + (td.name || ('分页 ' + (i + 1))) + '」（' + ((td.cards || []).length) + ' 报）替换当前分页「' + t.name + '」？没发布的卡片会丢。')) return;
+  savePv(CUR);
+  t.name = td.name || t.name;
+  t.eid = td.eid || t.eid;
+  t.src = td.src || 'JMA';
+  t.pv = td.pv || t.pv || {};
+  applyArchiveCards(t.box, td.cards);
+  switchTab(CUR, true);
+  renum(); render(); renderSent();
+  renderTabBar(); updateMsCur(); scheduleSave();   // 改名/换编号不会触发 input，手动存档
+  renderWsList();
+  msg('已把存档里的「' + t.name + '」载回当前分页（' + ((td.cards || []).length) + ' 报，eventID ' + t.eid + ' ・ 信息源 ' + t.src + '）。', true);
+}
+function wsCopy(i){
+  const d = readArchive(); if(!d || !d.tabs[i]){ msg('存档里没有这一页。', false); return; }
+  const td = d.tabs[i];
+  if(!confirm('把存档里的「' + (td.name || ('分页 ' + (i + 1))) + '」复制成新的一页？')) return;
+  newTab();
+  const t = curTab();
+  if(!t){ msg('新分页没建起来。', false); return; }
+  t.name = (td.name || '地震') + ' ・ 副本';
+  t.eid = td.eid || t.eid;
+  t.src = td.src || 'JMA';
+  t.pv = td.pv || {};
+  applyArchiveCards(t.box, td.cards);
+  switchTab(TABS.length - 1, true);
+  renum(); render(); renderSent();
+  renderTabBar(); updateMsCur(); scheduleSave();
+  renderWsList();
+  msg('已复制成新分页「' + t.name + '」（' + ((td.cards || []).length) + ' 报，沿用同一个 eventID ' + t.eid + '；要换新号就点「🎲 换一个」）。', true);
+}
+function wsRename(i){
+  const d = readArchive(); if(!d || !d.tabs[i]) return;
+  const nv = prompt('给存档里的这一页换个名（直接改本地存档）：', d.tabs[i].name || '');
+  if(nv === null) return;
+  d.tabs[i].name = nv.trim() || d.tabs[i].name;
+  lsSet(LS_TABS, JSON.stringify(d));
+  renderWsList();
+  msg('存档里的「' + (d.tabs[i].name) + '」已改名，回到页面点「🔄 刷新列表 / 载入」就能用上新名字。', true);
+}
+function wsDel(i){
+  const d = readArchive(); if(!d || !d.tabs[i]) return;
+  if(!confirm('从本地存档删掉这一页（「' + (d.tabs[i].name || ('分页 ' + (i + 1))) + '」）？其它分页不受影响。')) return;
+  d.tabs.splice(i, 1);
+  if(!d.tabs.length){
+    lsDel(LS_TABS);
+    renderWsList();
+    msg('存档已空（页面里现在的卡片不受影响；存档空了以后刷新就会回到空白「地震 1」）。', true);
+    return;
+  }
+  lsSet(LS_TABS, JSON.stringify(d));
+  renderWsList();
+  msg('已从存档删掉这一页。', true);
+}
+async function exportWs(){
+  const d = readArchive();
+  if(!d){ msg('本地没有存档可导出，先点「💾 保存工作区」。', false); return; }
+  try{
+    await navigator.clipboard.writeText(JSON.stringify(d, null, 2));
+    msg('工作区 JSON 已复制（' + d.tabs.length + ' 个分页 / ' + d.tabs.reduce((s,t)=>s + ((t.cards||[]).length), 0) + ' 报），粘到下面的导入框可以再导回来。', true);
+  }catch(e){ msg('复制失败：' + e.message + '。也可以只把需要的那一页数据手抄出来。', false); }
+}
+function importWs(){
+  const ta = document.getElementById('wsImport'); if(!ta) return;
+  let d;
+  try{ d = JSON.parse(ta.value); }
+  catch(e){ msg('这不是合法的 JSON：' + e.message, false); return; }
+  const tabs = Array.isArray(d) ? d : (d && Array.isArray(d.tabs) ? d.tabs : null);
+  if(!tabs || !tabs.length){ msg('JSON 里没找到分页数据（要一个 tabs 数组，或整个就是一个数组）。', false); return; }
+  const oldN = (readArchive() || { tabs: [] }).tabs.length;
+  if(!confirm('导入会<b>覆盖</b>当前本地存档（现在这份有 ' + oldN + ' 个分页），继续？')) return;
+  lsSet(LS_TABS, JSON.stringify({ v:2, at:nowJST(), cur:0, tabs: tabs }));
+  try{ restoreTabs(); }
+  catch(e){ msg('恢复失败：' + e.message + '（存档已写成新的，但页面可能没恢复上）。', false); return; }
+  const n = TABS.reduce((s,t)=>s + t.box.querySelectorAll('.card').length, 0);
+  renderTabBar(); updateMsCur(); renum(); render(); renderSent(); renderWsList();
+  msg('已导入 ' + TABS.length + ' 个分页 / ' + n + ' 报，直接接上改就行。', true);
+}
+// 任何输入/勾选、卡片增删、切页都自动存档（防抖 800ms），关页面前再兜一次
+document.addEventListener('input', scheduleSave, true);
+document.addEventListener('change', scheduleSave, true);
+if(typeof MutationObserver !== 'undefined'){
+  const pages = document.getElementById('tabPages');
+  if(pages) new MutationObserver(scheduleSave).observe(pages, { childList:true, subtree:true });
+}
+window.addEventListener('beforeunload', ()=>{ if(saveTimer) clearTimeout(saveTimer); saveTabs(true); });
+
+// ---------- 历史地震预设 ----------
+// 数值取自各次地震的公开实况（JMA 口径的震度 / 长周期地震动等级），仅用于快速搭测试报文，可自行改。
+const QP = [
+  { key:'tohoku',    name:'東日本大震災 2011-03-11 宮城県沖 M9.0（深29km・震度7・Lg3）',
+    eventID:'201103111446', placeName:'宮城県沖（仙台東方沖）', lat:38.30, lng:142.37, dep:29, mag:9.0,
+    imi:'7', lgi:'3', shock:'2011/03/11 14:46:18' },
+  { key:'wenchuan',  name:'汶川大地震 2008-05-12 四川省汶川县 M8.0（深14km・震度7・Lg0）',
+    eventID:'200805121528', placeName:'四川省汶川县', lat:31.02, lng:103.37, dep:14, mag:8.0,
+    imi:'7', lgi:'0', shock:'2008/05/12 15:28:04' },
+  { key:'kunamoto1', name:'熊本地震 2016-04-14 熊本県熊本地方 M7.0（前震・深10km・震度7・Lg1）',
+    eventID:'201604142126', placeName:'熊本県熊本地方', lat:32.79, lng:130.76, dep:10, mag:7.0,
+    imi:'7', lgi:'1', shock:'2016/04/14 21:26:00' },
+  { key:'kunamoto2', name:'熊本地震 2016-04-16 熊本県中部 M7.3（主震・深10km・震度7・Lg1）',
+    eventID:'201604160125', placeName:'熊本県中部', lat:32.79, lng:130.74, dep:10, mag:7.3,
+    imi:'7', lgi:'1', shock:'2016/04/16 01:25:00' },
+  { key:'hanshin',   name:'阪神・淡路大震災 1995-01-17 淡路島北部 M7.3（深16km・震度7・Lg2）',
+    eventID:'199501170546', placeName:'兵庫県淡路島北部', lat:34.59, lng:135.02, dep:16, mag:7.3,
+    imi:'7', lgi:'2', shock:'1995/01/17 05:46:53' },
+  { key:'noto',      name:'能登半島地震 2024-01-01 能登半島北部 M7.5（深10km・震度7・Lg0）',
+    eventID:'202401011610', placeName:'石川県能登半島北部', lat:37.50, lng:137.28, dep:10, mag:7.5,
+    imi:'7', lgi:'0', shock:'2024/01/01 16:10:11' },
+  { key:'hokkaido',  name:'北海道胆振東部地震 2018-09-06 M6.7（深40km・震度6+・Lg0）',
+    eventID:'201809060308', placeName:'北海道胆振東部', lat:42.70, lng:142.29, dep:40, mag:6.7,
+    imi:'6+', lgi:'0', shock:'2018/09/06 03:08:12' },
+  { key:'yushu',     name:'玉树地震 2010-04-14 青海省玉树 M6.9（深14km・震度6-・Lg0）',
+    eventID:'201004140849', placeName:'青海省玉树', lat:33.23, lng:96.66, dep:14, mag:6.9,
+    imi:'6-', lgi:'0', shock:'2010/04/14 08:49:38' },
+  { key:'lushan',    name:'芦山地震 2013-04-20 四川省芦山 M7.0（深17km・震度6-・Lg0）',
+    eventID:'201304200802', placeName:'四川省芦山县', lat:30.18, lng:102.99, dep:17, mag:7.0,
+    imi:'6-', lgi:'0', shock:'2013/04/20 08:02:16' },
+  { key:'hawaii1975', name:'夏威夷大地震 1975-11-28 17:35(HST) 夏威夷岛卡拉帕纳 M7.7（深5km・震度6+・Lg1・局地海啸14m）',
+    eventID:'197511281735', placeName:'美国夏威夷岛卡拉帕纳近海', lat:19.34, lng:-155.00, dep:5, mag:7.7,
+    imi:'6+', lgi:'1', shock:'1975/11/28 17:35:00' },
+  { key:'usgs_tx16', name:'【USGS真实样例】2026-11-09 所罗门群岛 M6.4（深17km・震度6-・Lg1）美国地质调查局实况',
+    eventID:'us7000tx16', placeName:'30 km WSW of Lata, Solomon Islands', lat:-10.8669, lng:165.5616, dep:17, mag:6.4,
+    imi:'6-', lgi:'1', shock:'2026/11/09 12:34:59', src:'USGS' }
+];
+// ---------- 本地存储（预设 / 分页工作区）—— localStorage 不可用时退化成内存，功能不中断 ----------
+const LS_QP = 'eqsender.qp.custom';   // 自定义地震预设
+const LS_TABS = 'eqsender.tabs';      // 地震分页工作区存档
+const LS_MEM = {};
+function lsGet(k){ try{ const v = localStorage.getItem(k); return (v == null ? '' : v); }catch(e){ return LS_MEM[k] || ''; } }
+function lsSet(k, v){ try{ localStorage.setItem(k, v); return true; }catch(e){ LS_MEM[k] = v; return false; } }
+function lsDel(k){ try{ localStorage.removeItem(k); }catch(e){} delete LS_MEM[k]; }
+function customQP(){
+  try{ const a = JSON.parse(lsGet(LS_QP)); return Array.isArray(a) ? a : []; }
+  catch(e){ return []; }
+}
+function saveCustomQP(a){ return lsSet(LS_QP, JSON.stringify(a)); }
+
+function initQP(){
+  const sel = document.getElementById('qpSel');
+  if(!sel) return;
+  const mine = customQP();
+  sel.innerHTML = '<option value="">— 选择一条历史地震 —</option>' +
+    QP.map(p=>'<option value="'+p.key+'">'+esc(p.name)+'</option>').join('') +
+    (mine.length ? '<optgroup label="我的自定义预设（localStorage 保存）">' +
+      mine.map(p=>'<option value="'+esc(p.key)+'">'+esc(p.name)+'</option>').join('') + '</optgroup>' : '');
+}
+function currentQP(){
+  const sel = document.getElementById('qpSel');
+  const k = sel && sel.value;
+  return allQP().find(p=>p.key === k) || null;
+}
+function allQP(){ return QP.concat(customQP()); }
+
+// ---------- 自定义地震预设：新增 / 修改 / 删除（存 localStorage） ----------
+let qpeKey = '';
+let qpeBuiltin = false;   // 这次在改的是内置历史地震（内置改不动，保存时另存成自定义版本）
+let qpeBase = null;       // 打开弹窗那一刻的表单快照，用来算「改了哪些」和「有没有没保存的改动」
+let qpeGone = false;      // 这条刚被删掉（提示语要说清「已删除」而不是「还没存过」）
+// 预设表单字段 -> 中文名（以后加字段就往这里补一行）
+const QP_LABEL = { qpeName:'名称', qpeId:'eventID', qpePlace:'位置名', qpeLat:'纬度', qpeLng:'经度',
+                   qpeDep:'深度', qpeMag:'震级', qpeImi:'最大震度', qpeLgi:'长周期等级', qpeShock:'发震时刻' };
+const QP_NUM = ['qpeLat','qpeLng','qpeDep','qpeMag'];   // 数值型按数值比，免得 38.3 / 38.30 被当成改过
+function qpeSnap(){
+  const o = {};
+  Object.keys(QP_LABEL).forEach(k => { const e = document.getElementById(k); o[k] = e ? String(e.value).trim() : ''; });
+  return o;
+}
+function qpeSnapEqual(a, b){
+  return Object.keys(QP_LABEL).every(k => {
+    if(QP_NUM.indexOf(k) >= 0){
+      const x = parseFloat(a[k]), y = parseFloat(b[k]);
+      return (isNaN(x) && isNaN(y)) || Math.abs(x - y) < 0.005;
+    }
+    return String(a[k] == null ? '' : a[k]) === String(b[k] == null ? '' : b[k]);
+  });
+}
+function qpeDiffList(a, b){
+  const out = [];
+  Object.keys(QP_LABEL).forEach(k => {
+    if(k === 'qpeName') return;                       // 名字已经在提示语里了
+    if(QP_NUM.indexOf(k) >= 0){
+      const x = parseFloat(a[k]), y = parseFloat(b[k]);
+      if(isFinite(x) && isFinite(y) && Math.abs(x - y) >= 0.005) out.push([QP_LABEL[k], String(x), String(y)]);
+    }else if(String(a[k] || '') !== String(b[k] || '')){
+      out.push([QP_LABEL[k], a[k] || '空', b[k] || '空']);
+    }
+  });
+  return out;
+}
+function qpeDirtyNow(){
+  try{ return !!(qpeBase && !qpeSnapEqual(qpeSnap(), qpeBase)); }catch(e){ return false; }
+}
+function updateQpeDirty(){
+  const el = document.getElementById('qpeDirty'); if(!el) return;
+  if(qpeGone){
+    el.textContent = '这条已经删掉了（本地存档里还剩 ' + customQP().length + ' 条自定义预设）。';
+  }else if(qpeDirtyNow()){
+    el.innerHTML = '● <b style="color:var(--warn)">有没保存的改动</b>：点「💾 保存预设」写进本地存档，或点「关闭」放弃这次改动。';
+  }else{
+    el.textContent = qpeKey ? ('这条已存好（本地存档里现在有 ' + customQP().length + ' 条自定义预设）。')
+                            : '还没存过：填完点「💾 保存预设」新增一条。';
+  }
+}
+
+// ---------- 自定义预设弹窗内的地图选点（与「📍 地图选点」弹窗共用坐标系/底图切换） ----------
+let qpeMap = null, qpeMarker = null, qpeBaseLayer = null, qpeBaseMode = 'amap';
+function qpeReadInputs(){
+  const a = document.getElementById('qpeLat'), b = document.getElementById('qpeLng');
+  const lat = parseFloat(a && a.value), lng = parseFloat(b && b.value);
+  return (isFinite(lat) && isFinite(lng)) ? [lat, lng] : null;
+}
+function qpeSetInfo(lat, lng){
+  const el = document.getElementById('qpeMapInfo');
+  if(el) el.textContent = '当前震中：纬度 ' + lat.toFixed(2) + '，经度 ' + lng.toFixed(2) + '（点「💾 保存预设」写进这条）';
+}
+function writeQPELatLng(lat, lng){
+  const a = document.getElementById('qpeLat'), b = document.getElementById('qpeLng');
+  if(a) a.value = lat.toFixed(2);
+  if(b) b.value = lng.toFixed(2);
+  qpeSetInfo(lat, lng);
+  updateQpeDirty();        // 地图/快捷城市是程序赋值的，不会触发 input 事件，这里补一次「有没保存的改动」
+}
+function qpeSetMarker(dlat, dlng){
+  if(!qpeMap || typeof L === 'undefined') return;
+  if(!qpeMarker) qpeMarker = L.marker([dlat, dlng], { interactive: false }).addTo(qpeMap);
+  else qpeMarker.setLatLng([dlat, dlng]);
+}
+function qpeRedrawMarker(){
+  const p = qpeReadInputs();
+  if(p) qpeSetMarker.apply(null, toDisplay(p[0], p[1], qpeBaseMode));
+}
+function qpeCity(lat, lng){
+  writeQPELatLng(lat, lng);
+  const d = toDisplay(lat, lng, qpeBaseMode);
+  if(qpeMap){ qpeMap.setView(d, 6); qpeSetMarker.apply(null, d); }
+}
+// 用页面上（当前分页）最后一张报的坐标填进来，省得手抄
+function qpeFromCards(){
+  let host = null;
+  try{ host = curBox(); }catch(e){ host = null; }
+  const cards = host ? host.querySelectorAll('.card') : [];
+  const c = cards.length ? cards[cards.length - 1] : null;
+  if(!c){ msg('当前分页还没有报文卡，先加一张再用这个。', false); return; }
+  const lat = parseFloat(c.querySelector('.f-lat').value), lng = parseFloat(c.querySelector('.f-lng').value);
+  if(!isFinite(lat) || !isFinite(lng)){ msg('那张卡没有有效坐标。', false); return; }
+  qpeCity(lat, lng);
+  msg('已把页面上最后一张报的坐标（' + lat + ', ' + lng + '）填进这里，记得另存或点「💾 保存预设」。', true);
+}
+function qpeApplyBase(mode){
+  if(!qpeMap || typeof L === 'undefined') return;
+  const t = TILES[mode]; if(!t) return;
+  qpeBaseMode = mode;
+  if(qpeBaseLayer) qpeMap.removeLayer(qpeBaseLayer);
+  const opt = { maxZoom: t.max, minZoom: 3, attribution: t.attr };
+  if(t.sub) opt.subdomains = t.sub;
+  qpeBaseLayer = L.tileLayer(t.url, opt).addTo(qpeMap);
+  qpeMap.setMaxZoom(t.max);
+}
+function qpeSwitchBase(mode){
+  if(!qpeMap || mode === qpeBaseMode) return;
+  const c = qpeMap.getCenter();
+  const w = fromDisplay(c.lat, c.lng, qpeBaseMode);
+  qpeApplyBase(mode);
+  qpeMap.setView(toDisplay(w[0], w[1], qpeBaseMode), qpeMap.getZoom());
+  qpeRedrawMarker();
+}
+function initQPEMap(){
+  if(qpeMap){ try{ qpeMap.remove(); }catch(e){} qpeMap = null; qpeMarker = null; qpeBaseLayer = null; }
+  qpeBaseMode = 'amap';
+  const p = qpeReadInputs() || [35.68, 139.76];
+  qpeSetInfo(p[0], p[1]);
+  withLeaflet(ok => {
+    const mp = document.getElementById('qpeMap'), fb = document.getElementById('qpeFallback');
+    if(!ok){
+      if(mp) mp.style.display = 'none';
+      if(fb) fb.style.display = 'flex';
+      return;
+    }
+    if(mp) mp.style.display = '';
+    if(fb) fb.style.display = 'none';
+    try{
+      qpeMap = L.map('qpeMap', { center: toDisplay(p[0], p[1], qpeBaseMode), zoom: 5, minZoom: 3 });
+      qpeApplyBase(qpeBaseMode);
+      qpeMap.on('click', e => {
+        const w = fromDisplay(e.latlng.lat, e.latlng.lng, qpeBaseMode); // w = [纬度, 经度]
+        const lat = Math.round(w[0]*100)/100, lng = Math.round(w[1]*100)/100;
+        qpeSetMarker.apply(null, toDisplay(lat, lng, qpeBaseMode));
+        writeQPELatLng(lat, lng);
+      });
+      qpeSetMarker.apply(null, toDisplay(p[0], p[1], qpeBaseMode));
+      const sel = document.getElementById('qpeBaseSel');
+      if(sel){ sel.value = qpeBaseMode; sel.onchange = ev => qpeSwitchBase(ev.target.value); }
+      setTimeout(()=>{ if(qpeMap) qpeMap.invalidateSize(); }, 60); // 弹窗刚由隐藏变可见，需重算尺寸
+    }catch(e){
+      if(mp) mp.style.display = 'none'; if(fb) fb.style.display = 'flex';
+    }
+  });
+}
+
+function closeQPEditor(){
+  // 改了没保存就关掉会白改 —— 拦一下（Esc 也走这里）
+  if(qpeDirtyNow() &&
+     !confirm('这条地震预设改了还没保存，关掉就白改了。\n\n点「确定」＝放弃这次改动，点「取消」＝继续留在这里改。')) return;
+  const m = document.getElementById('qpModal'); if(m) m.classList.remove('on');
+  if(qpeMap){ try{ qpeMap.remove(); }catch(e){} }
+  qpeMap = null; qpeMarker = null; qpeBaseLayer = null;
+}
+function openQPEditor(key){
+  const m = document.getElementById('qpModal'); if(!m) return;
+  // 不传 key（工具栏那颗「✏️ 编辑所选预设」）时，就编辑「🎯 历史地震预设」下拉里选中的那条
+  if(!key){ const sel = document.getElementById('qpSel'); key = sel ? sel.value : ''; }
+  const mine = customQP();
+  const p = key ? allQP().find(x => x.key === key) : null;
+  qpeBuiltin = !!(p && QP.some(x => x.key === key));
+  qpeKey = p ? p.key : '';
+  qpeGone = false;
+  const g = id => { const e = document.getElementById(id); return e ? e.value : ''; };
+  const s = (id, v) => { const e = document.getElementById(id); if(e) e.value = (v == null ? '' : v); };
+  s('qpeName',  p ? p.name : '');
+  s('qpeId',    p ? p.eventID : ('EQ_' + Date.now()));
+  s('qpePlace', p ? p.placeName : '');
+  s('qpeLat',   p ? p.lat : 35.68);
+  s('qpeLng',   p ? p.lng : 139.76);
+  s('qpeDep',   p ? p.dep : 10);
+  s('qpeMag',   p ? p.mag : 5.0);
+  s('qpeShock', p ? p.shock : nowJST());
+  const i1 = document.getElementById('qpeImi'), i2 = document.getElementById('qpeLgi');
+  if(i1) i1.innerHTML = intOptsSel(selI, p ? p.imi : '');
+  if(i2) i2.innerHTML = intOptsSel(selL, p ? p.lgi : '');
+  s('qpeImi', p ? (p.imi == null ? '' : p.imi) : '');
+  s('qpeLgi', p ? (p.lgi == null ? '' : p.lgi) : '');
+  document.getElementById('qpeKeyHint').innerHTML = !p
+    ? '新建一条自定义预设，保存后出现在预设下拉的「我的自定义预设」分组里（也可以编辑内置的历史地震——保存时会另存成你的版本，内置那条保持原样）。'
+    : qpeBuiltin
+      ? ('正在改<b>内置历史地震</b>「' + esc(p.name) + '」。内置那几条改不动，点「💾 保存预设」会把改完的版本<b>另存成你自己的一条自定义预设</b>，下拉里就会多出来。')
+      : ('正在修改自定义预设「' + esc(p.name) + '」（保存后覆盖这一条）。');
+  m.classList.add('on');
+  qpeBase = qpeSnap();                                         // 之后所有改动都跟这份快照比，用来提示「改了什么 / 有没有存」
+  updateQpeDirty();
+  initQPEMap();                                                // 地图按上面两个经纬度框居中
+  Object.keys(QP_LABEL).forEach(k => {                         // 任何一栏改动都刷新「有没有没保存的改动」
+    const e = document.getElementById(k); if(e) e.oninput = updateQpeDirty;
+  });
+  const _la = document.getElementById('qpeLat'), _ln = document.getElementById('qpeLng');
+  const _onGeo = () => { qpeRedrawMarker(); updateQpeDirty(); };
+  if(_la) _la.oninput = _onGeo;                                // 手输坐标时标记跟着动
+  if(_ln) _ln.oninput = _onGeo;
+}
+function saveQPEdited(){
+  const g = id => { const e = document.getElementById(id); return (e ? String(e.value).trim() : ''); };
+  const num = (id, dft) => { const v = parseFloat(g(id)); return isNaN(v) ? dft : v; };
+  const name = g('qpeName');
+  if(!name){ msg('先给这条预设起个名字（它会显示在预设下拉里）。', false); return; }
+  const p = {
+    key: qpeKey || ('custom_' + Date.now() + '_' + Math.floor(Math.random() * 1e5).toString(36)),
+    name: name,
+    eventID: g('qpeId') || ('EQ_' + Date.now()),
+    placeName: g('qpePlace'),
+    lat: num('qpeLat', 0), lng: num('qpeLng', 0), dep: num('qpeDep', 10), mag: num('qpeMag', 5),
+    imi: g('qpeImi'), lgi: g('qpeLgi'), shock: g('qpeShock') || nowJST(), custom: true
+  };
+  const oldName = (()=>{ const o = customQP().find(x => x.key === p.key); return o ? o.name : ''; })();
+  // 内置历史地震是页面自带的，改不动 —— 给这一份换一个新 key 存成用户自己的一条
+  // （另存之后 qpeBuiltin 要立刻清掉，否则再点保存会又多出一份同名副本而不是覆盖）
+  const madeCopy = qpeBuiltin;
+  if(qpeBuiltin){
+    p.key = 'custom_' + Date.now() + '_' + Math.floor(Math.random() * 1e5).toString(36);
+    qpeBuiltin = false;
+  }
+  const a = customQP();
+  const i = a.findIndex(x => x.key === p.key);
+  if(i >= 0) a[i] = p; else a.push(p);
+  const changeNote = qpeChangeNote();   // 先用旧基线算出「改了什么」，再更新基线
+  const ok = saveCustomQP(a);
+  qpeKey = p.key;
+  qpeBase = qpeSnap();            // 这一版算已存好的基线
+  updateQpeDirty();
+  const sel = document.getElementById('qpSel');
+  if(sel) sel.value = p.key;      // 选中的就是刚存/改的那条
+  initQP();
+  if(sel) sel.value = p.key;
+  render();
+  msg((madeCopy
+      ? ('内置「' + oldName + '」保持原样，改好的版本已另存成一条你自己的预设「' + name + '」')
+      : ((i >= 0 ? '已更新' : '已新增') + '预设「' + name + '」')) +
+      changeNote +
+      (ok ? '（已写入 localStorage）。' : '（localStorage 不可用，只保在本页面内存里）。') +
+      '可以在这里继续改，或关掉后回上面选它填入。', true);
+}
+// 保存时把这次「改了哪些」摊开给用户看：改过的项按「旧 → 新」列出来（最多 4 项，多了说共几项）
+function qpeChangeNote(){
+  try{
+    const d = qpeDiffList(qpeBase || {}, qpeSnap());
+    if(!d.length) return '';
+    const txt = d.slice(0, 4).map(x => x[0] + ' ' + x[1] + ' → ' + x[2]).join('；');
+    return '（本次改动：' + txt + (d.length > 4 ? ('，共 ' + d.length + ' 项）') : '）');
+  }catch(e){ return ''; }
+}
+function delQPEdited(){
+  if(qpeBuiltin){ msg('内置历史地震删不了（它是页面自带的）。想删掉自己改出来的版本，先点「💾 保存预设」再删这条。', false); return; }
+  if(!qpeKey){ msg('先点「＋ 新建一条」或从预设下拉选一条「我的自定义预设」再删。', false); return; }
+  const old = customQP().find(x => x.key === qpeKey);
+  if(!confirm('删除自定义预设「' + (old ? old.name : qpeKey) + '」？这只是模板，不会影响已经填进卡片的报文。')) return;
+  saveCustomQP(customQP().filter(x => x.key !== qpeKey));
+  const sel = document.getElementById('qpSel');
+  if(sel && sel.value === qpeKey) sel.value = '';
+  qpeKey = ''; qpeBase = null; qpeGone = true;
+  initQP();
+  updateQpeDirty();
+  msg('已删除自定义预设「' + (old ? old.name : '') + '」（' + (old ? old.eventID : '') + '）：下拉里不再有它，'
+      + '已经填进卡片的报文不受影响；本地存档里现在还剩 ' + customQP().length + ' 条自定义预设。', true);
+}
+// 把预设填进一张已存在的卡（没有就新建一张）
+function fillPresetTo(card, p, shockTs){
+  const q = s => card.querySelector(s);
+  q('.f-id').value = p.eventID;
+  q('.f-place').value = p.placeName;
+  q('.f-lat').value = p.lat;
+  q('.f-lng').value = p.lng;
+  q('.f-dep').value = p.dep;
+  q('.f-mag').value = p.mag.toFixed(1);
+  if(p.src) q('.f-src').value = p.src;   // 预设可自带信息源（如 USGS），填卡时自动写入 sourceName
+  q('.f-imi').value = p.imi;      // 留空会强制 isCSIS=true，这里都给了实值
+  q('.f-lgi').value = p.lgi;
+  q('.f-st').value = shockTs || p.shock;   // 默认填「现在」；勾了「🕓 用历史发震时刻」才是这条地震的真实历史时刻
+  q('.f-rt').value = nowJST();    // 发布时刻取现在
+  q('.f-num').value = 1;
+  q('.f-wave').value = '';
+  q('.f-plum').checked = false;
+  q('.f-cancel').checked = false;
+  q('.f-final').checked = false;
+  q('.f-csis').checked = false;
+  q('.f-rest').checked = !!document.getElementById('qpRest').checked;
+  updateWaveKm(card);
+  if(card._upd) card._upd();
+  render();
+}
+// mode='single' 直接填入当前卡；mode='series' 作为末报最终值生成多报序列
+function applyQuakePreset(mode){
+  const p = currentQP();
+  if(!p){ msg('先在「🎯 历史地震预设」里选一条地震。', false); return; }
+  const host = curBox();
+  const qm = document.getElementById('qpIMode').value;   // calc / calc_local / blank / none
+  // 发震时刻：默认「现在」（历史时刻是几十年前，波早跑完了，EQuake 会一片空白）；
+  // 勾了「🕓 用历史发震时刻」才沿用这条地震的真实发震时刻
+  const _hisEl = document.getElementById('qpHisTime');
+  const useHis = _hisEl ? !!_hisEl.checked : false;
+  const shockTs = useHis ? p.shock : nowJST();
+  const timeNote = useHis
+    ? ('发震时刻沿用历史时刻 ' + p.shock)
+    : ('发震时刻已设为现在 ' + shockTs + '（这条地震真实发生在 ' + p.shock + '，要复现就勾「🕓 用历史发震时刻」）');
+  if(mode === 'single'){
+    const cards = host.querySelectorAll('.card');
+    const card = cards.length ? cards[cards.length - 1] : addCard();  // 填到最后一张，后面照样能加报
+    fillPresetTo(card, p, shockTs);                                   // 默认就是本项目直接给的震度（预设里的历史实况值）
+    const q = s => card.querySelector(s);
+    if(qm === 'calc_local'){
+      // 「按本项目算法重算」：用震级+深度过一遍本地算法，覆盖括号里写的实况值
+      const r = calcIntensity(p.mag, p.dep);
+      q('.f-imi').value = r.imi; q('.f-lgi').value = r.lgi;
+      q('.f-csis').checked = false; q('.f-csis').disabled = false;
+    } else if(qm === 'blank'){
+      q('.f-imi').value = ''; q('.f-lgi').value = '';
+    } else if(qm === 'none'){
+      q('.f-imi').value = '不明'; q('.f-lgi').value = '不明';
+      q('.f-csis').checked = false; q('.f-csis').disabled = false;
+    }
+    if(card._upd) card._upd();
+    render();
+    const src = qm === 'calc' ? '震度直接填本项目预设的历史实况值（' + p.imi + ' / ' + p.lgi + '）'
+      : qm === 'calc_local' ? '震度按本项目算法重算（M' + p.mag + ' / 深 ' + p.dep + ' km）'
+      : qm === 'blank' ? '震度置空交给 EQuake 自行推算（会自动勾 isCSIS）'
+      : '震度填「不明」';
+    msg('已把「' + p.name.split('（')[0] + '」填进第 ' + host.querySelectorAll('.card').length + ' 张卡（' + timeNote +
+        '，' + src + '；勾了「波从震中重新发出」= 送达时从震中重新出发）。', true);
+    return;
+  }
+  // 生成多报：凑一个「末报最终值」给 makeSeries；震度按「历史地震预设」面板里选的来源决定
+  let imi = p.imi, lgi = p.lgi;
+  if(qm === 'calc_local'){ const r = calcIntensity(p.mag, p.dep); imi = r.imi; lgi = r.lgi; }
+  else if(qm === 'blank'){ imi = ''; lgi = ''; }
+  else if(qm === 'none'){ imi = '不明'; lgi = '不明'; }
+  // 主面板「生成多报序列」里若手填了 eventID / 信息源，优先用它；留空则沿用预设自带的
+  const _eidEl = document.getElementById('msEid'), _srcEl = document.getElementById('msSrc');
+  const _eid = _eidEl ? _eidEl.value.trim() : '', _src = _srcEl ? _srcEl.value.trim() : '';
+  const fin = {
+    eventID: _eid || p.eventID, placeName: p.placeName, sourceName: _src || 'JMA',
+    latitude: p.lat, longitude: p.lng, depth: p.dep, magnitude: p.mag,
+    maxIntensity: imi, maxLgInt: lgi, isCSIS: (imi === '' || lgi === ''),
+    isPLUM: false, isFinal: true, reportNum: 1, shockTime: shockTs, waveElapsed: null
+  };
+  const opt = {
+    n: document.getElementById('msN').value,
+    nApprox: document.getElementById('msNMode').value === 'approx',
+    gap: document.getElementById('msG').value,
+    gapApprox: document.getElementById('msGMode').value === 'approx',
+    rest: !!document.getElementById('qpRest').checked,
+    // 预设默认「本项目直接给实况值」= 让 makeSeries 按每报自己的震级走一遍本地算法（首报弱、末报强，震度自然递增）
+    iMode: (qm === 'calc' || qm === 'calc_local') ? 'calc' : (qm === 'blank' ? 'blank' : 'none'),
+    sync: syncSeriesOpt()
+  };
+  const series = makeSeries(fin, opt);
+  if(host.children.length && !confirm('主页面上已有 ' + host.children.length + ' 张卡片，生成多报会先清空它们，继续？')) return;
+  host.innerHTML = '';
+  series.forEach(d => {
+    const c = addCard();
+    fillCard(c, d);
+    c.querySelector('.f-rest').checked = !!d.reStamp;
+    c.querySelector('.f-en').checked = true;
+    if(_eid) c.querySelector('.f-id').value = _eid;
+    if(_src) c.querySelector('.f-src').value = _src;
   });
   renum(); render();
   const f1 = series[0], fN = series[series.length - 1];
-  msg('已生成 ' + series.length + ' 报：第 ' + f1.reportNum + ' 报 M' + f1.magnitude.toFixed(1) +
-      ' → 第 ' + fN.reportNum + ' 报 M' + fN.magnitude.toFixed(1) + '（末报 = 你设定的最终数值）。可逐张微调后点「📤 发布到服务器」。', true);
+  const srcTxt = opt.iMode === 'calc' ? '震度由本项目算法按每报震级算（末报 ' + fN.maxIntensity + ' / Lg ' + fN.maxLgInt + '）'
+    : opt.iMode === 'blank' ? '震度置空交给 EQuake 计算（每报自动勾 isCSIS）'
+    : '震度全部填「不明」';
+  bumpTab();
+  msg('已在「' + (curTab() ? curTab().name : '当前分页') + '」按「' + p.name.split('（')[0] + '」生成 ' + series.length + ' 报：第 ' + f1.reportNum + ' 报 M' + f1.magnitude.toFixed(1) +
+      ' → 第 ' + fN.reportNum + ' 报 M' + fN.magnitude.toFixed(1) + '（末报 = 预设的最终值），共用 eventID ' + fN.eventID +
+      ' / 信息源 ' + (fN.sourceName || 'JMA') + '；' + srcTxt + '。' +
+      (opt.sync ? '发震时刻已逐报同步到各报自己的发布时刻。' : '整条序列共用一个发震时刻 ' + fN.shockTime + '。'), true);
 }
 // 地图在主页面（弹窗遮住它），所以提供「把主页面当前坐标搬过来」的按钮
 function syncMore(){
@@ -1032,6 +3099,13 @@ function redrawMoreMarker(){
   const lng = parseFloat(moreCard.querySelector('.f-lng').value);
   if(isFinite(lat) && isFinite(lng)) setMoreMarker.apply(null, toDisplay(lat, lng, moreBaseMode));
 }
+function moreCity(lat, lng){
+  if(moreMap){
+    moreMap.setView(toDisplay(lat, lng, moreBaseMode), 6);
+    setMoreMarker.apply(null, toDisplay(lat, lng, moreBaseMode));
+  }
+  writeMoreLatLng(lat, lng);
+}
 function initMoreMap(){
   if(moreMap){ try{ moreMap.remove(); }catch(e){} moreMap = null; moreMarker = null; moreBaseLayer = null; }
   moreBaseMode = 'amap';
@@ -1039,20 +3113,22 @@ function initMoreMap(){
   const lng = parseFloat(moreCard.querySelector('.f-lng').value);
   let clat = 35.68, clng = 139.76; // 默认日本附近（无坐标时）
   if(isFinite(lat) && isFinite(lng)){ clat = lat; clng = lng; }
-  try{
-    moreMap = L.map('moreMap', { center: toDisplay(clat, clng, moreBaseMode), zoom: 5, minZoom: 3 });
-    applyMoreBase(moreBaseMode);
-    moreMap.on('click', e => {
-      const w = fromDisplay(e.latlng.lat, e.latlng.lng, moreBaseMode); // w = [纬度, 经度]
-      const lat = Math.round(w[0] * 100) / 100, lng = Math.round(w[1] * 100) / 100;
-      setMoreMarker.apply(null, toDisplay(lat, lng, moreBaseMode));
-      writeMoreLatLng(lat, lng);
-    });
-    setMoreMarker.apply(null, toDisplay(clat, clng, moreBaseMode));
-    const mEl = document.getElementById('moreBaseSel');
-    if(mEl) mEl.addEventListener('change', ev => switchMoreBase(ev.target.value));
-    setTimeout(()=>{ if(moreMap) moreMap.invalidateSize(); }, 60); // 弹窗由 display:none 变可见，需重算尺寸
-  }catch(e){ /* 地图加载失败也不影响手动输入坐标 */ }
+  withLeaflet(() => {
+    try{
+      moreMap = L.map('moreMap', { center: toDisplay(clat, clng, moreBaseMode), zoom: 5, minZoom: 3 });
+      applyMoreBase(moreBaseMode);
+      moreMap.on('click', e => {
+        const w = fromDisplay(e.latlng.lat, e.latlng.lng, moreBaseMode); // w = [纬度, 经度]
+        const lat = Math.round(w[0] * 100) / 100, lng = Math.round(w[1] * 100) / 100;
+        setMoreMarker.apply(null, toDisplay(lat, lng, moreBaseMode));
+        writeMoreLatLng(lat, lng);
+      });
+      setMoreMarker.apply(null, toDisplay(clat, clng, moreBaseMode));
+      const mEl = document.getElementById('moreBaseSel');
+      if(mEl) mEl.addEventListener('change', ev => switchMoreBase(ev.target.value));
+      setTimeout(()=>{ if(moreMap) moreMap.invalidateSize(); }, 60); // 弹窗由 display:none 变可见，需重算尺寸
+    }catch(e){ /* 地图加载失败也不影响手动输入坐标 */ }
+  });
 }
 // 直接取消本次地震：立即发一条 isCancel 报（同 eventID），并作废排队中的后续报文
 async function cancelEvent(ev){
@@ -1109,30 +3185,63 @@ function msg(t,ok){
   m.textContent = t; m.className = ok?'ok':'err';
   clearTimeout(m._t); m._t = setTimeout(()=>{m.textContent='';},6000);
 }
+
+// ---------- 正式报 / P/S 波显示模式 ----------
+// EQuake 的「P 波 / S 波」是「推算震源」画出来的波前，与报文报种无关，由 EQuake 自己的设置控制。
+// 所以「没有 P/S 波的正式报」= 卡片上的「📋 正式报」报种（isFinal 确定报）+ 这里把波前关掉。
+// 设置写在 %APPDATA%\EQuake\config\Settings.ini，服务器自动备份成 .bak，改完必须重启 EQuake。
+const PS_LABEL = { show:'显示波前（默认）', wave:'只隐藏推算震源 P/S 波', full:'完全不画波前（正式报）' };
+let psQueried = false;
+function psPaint(r){
+  const sel = document.getElementById('psMode'), st = document.getElementById('psState'), bar = document.getElementById('psBar');
+  if(!sel || !st) return;
+  if(!r || !r.ok){
+    sel.disabled = true;
+    st.textContent = r && r.error ? ('⚠ ' + r.error) : '⚠ 服务器不支持（请重启 startserver.bat）';
+    if(bar) bar.classList.remove('full');
+    return;
+  }
+  sel.disabled = false;
+  sel.value = r.mode;
+  st.textContent = (r.mode === 'full' ? '✓ 已关闭' : r.mode === 'wave' ? '✓ 部分隐藏' : '当前：' + PS_LABEL[r.mode]) +
+                   (r.backup ? ' · 已备份 .bak' : '');
+  if(bar) bar.classList.toggle('full', r.mode === 'full');
+}
+async function refreshPsMode(quiet){
+  const st = document.getElementById('psState');
+  if(st) st.textContent = '读取中…';
+  if(!apiReady){ psPaint(null); return; }
+  try{
+    const r = await (await fetch(API + '/pswave', { cache:'no-store' })).json();
+    if(!r || typeof r !== 'object' || Array.isArray(r) || !('ok' in r)) { psPaint(null); return; }
+    psPaint(r);
+  }catch(e){ psPaint(null); }
+}
+async function setPsMode(mode){
+  if(!PS_LABEL[mode]) return;
+  if(mode !== 'show' && !confirm(
+      '将修改 EQuake 的 Settings.ini（首次自动备份为 .bak）：\n「' + PS_LABEL[mode] + '」\n\n' +
+      '注意：请先完全退出 EQuake 再改，改完重新打开 EQuake 才会生效；\n' +
+      '若 EQuake 仍在运行，它退出时可能把设置覆盖回去。\n\n继续吗？')){
+    await refreshPsMode(true); return;
+  }
+  try{
+    const r = await postJson('/pswave', JSON.stringify({ mode: mode }));
+    if(!r || !r.ok){ msg('切换失败：' + ((r && r.error) || '未知原因'), false); await refreshPsMode(true); return; }
+    psPaint(r);
+    msg('已把 EQuake 的 P/S 波设为「' + PS_LABEL[r.mode] + '」' +
+        (r.backupMade ? '（原设置已备份到 Settings.ini.bak）' : '') +
+        '。请完全退出并重新打开 EQuake 生效；之后发「📋 正式报」就不会出现 P/S 波前了。', true);
+  }catch(e){ msg('切换失败：' + (e.message || e) + '（若是服务器刚更新，请重启 startserver.bat）', false); await refreshPsMode(true); }
+}
+function maybeQueryPs(){ if(apiReady && !psQueried){ psQueried = true; refreshPsMode(true); } }
 function copyJson(){ navigator.clipboard.writeText(JSON.stringify(buildArray(),null,2)).then(()=>msg('JSON 已复制。',true)); }
 function copySub(){
   const t = document.getElementById('subUrl').textContent;
-  if(t.indexOf('http') !== 0){ msg('服务器未连接，先启动 启动服务器.bat。',false); return; }
+  if(t.indexOf('http') !== 0){ msg('服务器未连接，先启动 startserver.bat。',false); return; }
   navigator.clipboard.writeText(t).then(()=>msg('订阅地址已复制。',true));
 }
-function goCity(lat, lng){
-  if(map){
-    map.setView(toDisplay(lat, lng), 6);
-    setMarker.apply(null, toDisplay(lat, lng));
-  }
-  document.querySelectorAll('#cards .card').forEach(c=>{
-    c.querySelector('.f-lat').value = lat;
-    c.querySelector('.f-lng').value = lng;
-  });
-  render();
-}
-
-function mapFallbackUI(){
-  document.getElementById('map').style.display='none';
-  document.getElementById('mapFallback').style.display='flex';
-  const bs = document.getElementById('baseSel');
-  if(bs) bs.style.display='none';
-}
+// Leaflet 按需加载：主页面已无常驻地图，只有打开「地图选点」/「继续加报」弹窗时才加载
 function ensureLeaflet(cb){
   if(typeof L !== 'undefined'){ cb(true); return; }
   const list = [
@@ -1150,20 +3259,8 @@ function ensureLeaflet(cb){
   };
   next();
 }
-function initMap(){
-  try{
-    map = L.map('map',{ center: toDisplay(33.0,132.0), zoom: 5, minZoom: 3 });
-    applyBase('amap');
-    map.on('click', e=>{
-      const w = fromDisplay(e.latlng.lat, e.latlng.lng); // w = [纬度, 经度]
-      const lat = Math.round(w[0]*100)/100, lng = Math.round(w[1]*100)/100;
-      setMarker.apply(null, toDisplay(lat, lng));
-      writeLatLng(lat, lng);
-    });
-    setMarker.apply(null, toDisplay(35.68,139.76));
-    document.getElementById('baseSel').addEventListener('change', ev=>switchBase(ev.target.value));
-    setTimeout(()=>{ if(map) map.invalidateSize(); }, 250); // 布局稳定后重算尺寸，避免点击落点偏移
-  }catch(e){ mapFallbackUI(); }
+function withLeaflet(cb){
+  ensureLeaflet(ok => { setTimeout(()=>cb(ok), 0); });
 }
 
 // 官方格式示例（青森県東方沖）: 用于对照验证 EQuake 链路
@@ -1208,7 +3305,9 @@ function fillCard(c, d){
   q('.f-src').value = d.sourceName;
   q('.f-delay').value = d.delaySec || 0;
   q('.f-wave').value = (d.waveElapsed === null || d.waveElapsed === undefined) ? '' : d.waveElapsed;
+  paintOfficial(c, !!d.official);   // 正式报徽标随报文一起回填（载入示例/加报时清掉）
   updateWaveKm(c);
+  if(c._upd) c._upd(); // 回填后刷新「EQuake 计算」与 isCSIS 的联动（含禁用状态）
 }
 // 震波已发出(秒) -> 估算已向外扩散的公里数（按约 7 km/s 的波速，仅作直观提示）
 function updateWaveKm(card){
@@ -1223,7 +3322,7 @@ function updateWaveKm(card){
   span.textContent = '≈ ' + (km >= 100 ? km.toFixed(0) : km.toFixed(1)) + ' km（按 ~7 km/s 估算）';
 }
 function loadSample(){
-  document.getElementById('cards').innerHTML = '';
+  curBox().innerHTML = '';
   SAMPLES.forEach(d=>{ fillCard(addCard(), d); });
   renum(); render();
   msg('已载入官方示例（①青森県東方沖 M0.0 速报 立即发出 → ②同一事件 30 秒后最终报告），点「发布到服务器」看 EQuake 反应。', true);
@@ -1257,22 +3356,75 @@ dl.innerHTML = ['JMA','CENC','USGS','SC','CEIC','FJ','TW','KMA','PTWC'].map(x=>'
 document.body.appendChild(dl);
 
 window.addEventListener('DOMContentLoaded',()=>{
-  addCard();
-  ensureLeaflet(ok=>{ if(ok) initMap(); else mapFallbackUI(); });
+  initQP();
+    // 恢复上次选的「发震/发布时刻始终同步」（工具栏开关，默认开）与时区（默认 UTC+9）
+    try{
+      const sv = localStorage.getItem('eqSyncRTST');
+      const el = document.getElementById('syncRTST');
+      if(el && sv !== null) el.checked = (sv === '1');
+      const tz = localStorage.getItem('eqTZ');
+      TZ_H = (tz === '8') ? 8 : 9;    // 默认 UTC+9（EQuake 按日本时间解读）
+    const tzSel = document.getElementById('tzSel');
+    if(tzSel) tzSel.value = String(TZ_H);
+    const ms = document.getElementById('msSync');
+    if(ms && el) ms.checked = el.checked;
+    if(ms) ms.addEventListener('change', ()=>{ const s = document.getElementById('srSync'); if(s) s.checked = ms.checked; });
+  }catch(e){}
+  startClock();                 // 工具栏「本机现在」时钟
+  refreshSyncBtns();
+  try{ if(apiReady) postJson('/tz', JSON.stringify({ off: TZ_H })); }catch(e){}
+  // 先尝试从本地存档恢复所有地震分页（卡片/名称/eventID/信息源/面板参数），没有存档才建空白的「地震 1」
+  let restored = false;
+  try{ restored = restoreTabs(); }catch(e){ restored = false; }
+  if(!restored){
+    initTabs();   // 先建好分页（#cards 指向「地震 1」），再放第一张卡
+    addCard();
+    msg('已建好「地震 1」（自动分配 eventID ' + (TABS[0] ? TABS[0].eid : '') + '）。所有改动会自动存进本地存档。', true);
+  }else{
+    const n = TABS.reduce((s,t)=>s + t.box.querySelectorAll('.card').length, 0);
+    if(!n) addCard();   // 存档是个空工作区，也放一张卡，页面不至于全空
+    const drift = firstCardDrift();
+    msg('已从本地存档恢复 ' + TABS.length + ' 个地震分页（共 ' + n + ' 报）。' +
+        (drift !== null && Math.abs(drift) > 300
+          ? ('⚠ 卡片里的时刻比本机现在' + (drift > 0 ? '早 ' : '晚 ') + fmtGap(Math.abs(drift)) +
+             '（存档存的是上次保存时的值）；要跟现在走请点工具栏「⏱ 全部对齐本机」。')
+          : '要清空重来可用工具栏的「🧹 清除存档」。'), true);
+  }
+  // Leaflet 不再在页面加载时预載，打开「📍 地图选点」弹窗时才按需加载
   // 服务器探测与心跳
   findServer();
-  document.addEventListener('keydown', e=>{ if(e.key === 'Escape') closeMore(); }); // Esc 关闭加报弹窗
+  document.addEventListener('keydown', e=>{
+    if(e.key !== 'Escape') return;
+    closeMore(); closePick(); closeQPEditor(); closeWs();   // Esc 关闭加报 / 地图选点 / 预设编辑 / 工作区弹窗
+    const _dm = document.getElementById('discModal');   // 说明书：免责声明还弹着时不抢这个 Esc
+    if(!_dm || !_dm.classList.contains('on')) closeHelp();
+  });
   const beat = async()=>{
     if(!API){ findServer(); refreshSent(); return; } // 探测期间也要把栏位状态刷出来
     try{
       const r = await fetch(API + '/health', { cache: 'no-store' });
       const j = await r.json();
       apiReady = true; applyApi();
+      // 服务器那边的「每秒持续同步」开关：以服务器状态为准回填，避免重启后页面显示与实际不符
+      const lv = document.getElementById('liveSync');
+      if(lv && typeof j.live === 'boolean' && lv.checked !== j.live) lv.checked = j.live;
       const cli = document.getElementById('cli');
-      if(j.clientHits > 0){
-        cli.textContent = 'EQuake 取数 ' + j.clientHits + ' 次 · 最近 ' + j.clientLast + ' 请求 ' + (j.clientPath || '');
-      }else{
-        cli.textContent = 'EQuake 还没来取过数据';
+      cli.textContent = (j.clientHits > 0)
+        ? ('EQuake 取数 ' + j.clientHits + ' 次 · 最近 ' + j.clientLast + ' 请求 ' + (j.clientPath || ''))
+        : 'EQuake 还没来取过数据';
+      // 工具条上的取数自检：一眼看出「发布成功但 EQuake 没反应」是链路没通还是数据没被接收
+      const eqT = document.getElementById('eqLinkTxt'), eqW = document.getElementById('eqLink');
+      if(eqT){
+        const since = (typeof j.clientSinceSec === 'number') ? j.clientSinceSec : -1;
+        let t = '', c = '#b23c3c';
+        if(since >= 0 && since <= 12){ t = '✓ 正在取数（' + since + ' 秒前）'; c = '#1a7f37'; }
+        else if(j.clientHits > 0){ t = '⚠ 已 ' + since + ' 秒没取数'; }
+        else { t = '✗ 没在取数（EQuake 开着吗？地址设成 ' + API + '/json 了吗？）'; }
+        // 页面与服务器时区不一致 → EQuake 会按错 1 小时、整条报被丢弃
+        if(typeof j.tz === 'number' && j.tz !== TZ_H){ t += '｜服务器是 UTC+' + j.tz + '，页面是 UTC+' + TZ_H + '，请切一致'; c = '#b23c3c'; }
+        eqT.textContent = t;
+        eqT.style.color = c;
+        if(eqW) eqW.style.color = (t.indexOf('✓') === 0) ? '#1a7f37' : '#b23c3c';
       }
     }catch(e){ apiReady = false; applyApi(); }
     refreshSent();
